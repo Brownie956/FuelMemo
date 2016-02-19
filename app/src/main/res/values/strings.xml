@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FuelMemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="default_plate">Vehicle Plate</string>
+    <string name="default_name">Vehicle Name</string>
+    <string name="vehicles_title">Your Vehicles</string>
+    <string name="overview_title">Overview</string>
+    <string name="net_retry_prompt">Unfortunately we are having trouble finding a network connection. Please check your network connection and click retry</string>
+    <string name="net_con_btn_text">Connect</string>
+</resources>
