@@ -7,4 +7,5 @@
     <string name="overview_title">Overview</string>
     <string name="net_retry_prompt">Unfortunately we are having trouble finding a network connection. Please check your network connection and click retry</string>
     <string name="net_con_btn_text">Connect</string>
+    <string name="no_records">There are no records found for the plate</string>
 </resources>
