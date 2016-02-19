@@ -21,14 +21,31 @@
         android:id="@+id/overview_name_title"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:background="@color/pale_grey"/>
 
-    <ScrollView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/overview_heading_default"
+        android:id="@+id/last_n_records_heading"
+        android:layout_below="@id/overview_name_title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="50dp"
+        android:visibility="gone"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/last_n_records_scroll"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" >
+        android:layout_below="@id/last_n_records_heading"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
     </ScrollView>
+
 </RelativeLayout>

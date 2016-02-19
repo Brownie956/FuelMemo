@@ -3,9 +3,11 @@ package com.cfbrownweb.fuelmemo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -38,7 +40,7 @@ public class OverviewActivity extends AppCompatActivity {
 
     private RelativeLayout overviewLayout;
     private String plate = "";
-    private final String limit = "4";
+    private final String limit = "40";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,10 @@ public class OverviewActivity extends AppCompatActivity {
                             nRecordsScroll.addView(noRecordsTv);
                         }
                         else {
+                            //Display heading
+                            TextView heading = (TextView) findViewById(R.id.last_n_records_heading);
+                            heading.setVisibility(View.VISIBLE);
+
                             //Generate table from data
                             nRecordsScroll.addView(parseJSONArray(response));
                         }
@@ -110,6 +116,10 @@ public class OverviewActivity extends AppCompatActivity {
 
     private TableLayout parseJSONArray(String jString){
         TableLayout table = new TableLayout(this);
+        //Add column names
+        String[] colunms = new String[]{"Date", "Miles", "Cost", "£ / 10 miles"};
+        table.addView(genColRow(colunms));
+
         try {
             JSONArray jsonArray = new JSONArray(jString);
             for(int i = 0; i < jsonArray.length(); i++){
@@ -127,24 +137,58 @@ public class OverviewActivity extends AppCompatActivity {
                 String date = jsonObject.getString("date");
                 String miles = jsonObject.getString("miles");
                 String cost = jsonObject.getString("cost");
+                String formattedCost = "£" + cost;
 
                 //Calculate cost per 10 miles
                 double perTenMileDouble = Double.parseDouble(cost) / Double.parseDouble(miles);
                 perTenMileDouble = perTenMileDouble * 10;
                 perTenMileDouble = round(perTenMileDouble, 2);
                 String perTenMileString = String.valueOf(perTenMileDouble);
+                //Append any necessary 0s
+                while(perTenMileString.substring(perTenMileString.indexOf(".")).length() < 3){
+                    perTenMileString += "0";
+                }
+                //Add the £ sign
+                perTenMileString = "£" + perTenMileString;
 
                 //Set all of the text in TextViews
                 dateTv.setText(date);
                 milesTv.setText(miles);
-                costTv.setText("£" + cost);
-                perTenMileTv.setText("£" + perTenMileString);
+                costTv.setText(formattedCost);
+                perTenMileTv.setText(perTenMileString);
+
+                //Set text size
+                int textSize = 15;
+                dateTv.setTextSize(textSize);
+                milesTv.setTextSize(textSize);
+                costTv.setTextSize(textSize);
+                perTenMileTv.setTextSize(textSize);
+
+                //Set all padding
+                int cellPadding = 20;
+                dateTv.setPadding(cellPadding,cellPadding,cellPadding,cellPadding);
+                milesTv.setPadding(cellPadding,cellPadding,cellPadding,cellPadding);
+                costTv.setPadding(cellPadding, cellPadding, cellPadding, cellPadding);
+                perTenMileTv.setPadding(cellPadding, cellPadding, cellPadding, cellPadding);
+
+                //Centre all text
+                dateTv.setGravity(Gravity.CENTER);
+                milesTv.setGravity(Gravity.CENTER);
+                costTv.setGravity(Gravity.CENTER);
+                perTenMileTv.setGravity(Gravity.CENTER);
 
                 //Add all textViews to row
                 tableRow.addView(dateTv);
                 tableRow.addView(milesTv);
                 tableRow.addView(costTv);
                 tableRow.addView(perTenMileTv);
+
+                if(i % 2 == 0){
+                    tableRow.setBackgroundColor(ContextCompat.getColor(this, R.color.pale_grey));
+                }
+                else {
+                    tableRow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey));
+                }
 
                 //Add row to the table
                 table.addView(tableRow);
@@ -163,6 +207,21 @@ public class OverviewActivity extends AppCompatActivity {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    private TableRow genColRow(String[] cols){
+        TableRow colRow = new TableRow(this);
+        for(String col : cols){
+            TextView colName = new TextView(this);
+            colName.setText(col);
+            colName.setTextSize(15);
+            colName.setGravity(Gravity.CENTER);
+            int cellPadding = 20;
+            colName.setPadding(cellPadding, cellPadding, cellPadding, cellPadding);
+
+            colRow.addView(colName);
+        }
+        return colRow;
     }
 
 }
