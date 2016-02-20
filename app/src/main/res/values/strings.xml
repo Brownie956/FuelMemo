@@ -9,4 +9,8 @@
     <string name="net_con_btn_text">Connect</string>
     <string name="no_records">There are no records found for the plate</string>
     <string name="overview_heading_default">Previous records</string>
+    <string name="submit_btn_text">Submit</string>
+    <string name="date_input_error">Please select a valid date</string>
+    <string name="miles_input_error">Please enter a valid miles value</string>
+    <string name="cost_input_error">Please enter a valid cost value</string>
 </resources>

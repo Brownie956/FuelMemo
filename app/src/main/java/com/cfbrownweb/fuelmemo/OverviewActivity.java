@@ -1,19 +1,27 @@
 package com.cfbrownweb.fuelmemo;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.text.style.TtsSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -29,6 +37,11 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,27 +50,34 @@ public class OverviewActivity extends AppCompatActivity {
     private final static String TAG = "cfbrownweb"; //debug tag
 
     private final String lastNRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getLastNRecordsByPlate.php";
+    private final String addRecordUrl = "http://cfbrownweb.ngrok.io/fuel/addRecord.php";
 
     private RelativeLayout overviewLayout;
     private String plate = "";
     private final String limit = "40";
+    private String miles;
+    private String cost;
+    private static TextView dateInput;
+    private EditText milesInput;
+    private EditText costInput;
+    private static int year, month, day;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
+        //Reset date values
+        year = 0;
+        month = 0;
+        day = 0;
         overviewLayout = (RelativeLayout) findViewById(R.id.overview_content_layout);
+        dateInput = (TextView) findViewById(R.id.date_input);
+        milesInput = (EditText) findViewById(R.id.miles_input);
+        costInput = (EditText) findViewById(R.id.cost_input);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set titles
@@ -70,6 +90,9 @@ public class OverviewActivity extends AppCompatActivity {
 
         lastNRecordsReq();
 
+        nameTitle.requestFocus();
+        milesInput.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4, 2)});
+        costInput.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4, 2)});
     }
 
     public void lastNRecordsReq() {
@@ -225,4 +248,110 @@ public class OverviewActivity extends AppCompatActivity {
         return colRow;
     }
 
+
+    /*Date Picker Code*/
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
+            dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+            return dialog;
+        }
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int day){
+            //Can't pick a date in the future
+            GregorianCalendar selected = new GregorianCalendar(year, month,day);
+            if(selected.after(Calendar.getInstance())){
+                Toast.makeText(getActivity(),"Can't pick a date in the future", Toast.LENGTH_LONG).show();
+            }
+            else {
+                //Update editText
+                OverviewActivity.year = year;
+                OverviewActivity.month = month;
+                OverviewActivity.day = day;
+                dateInput.setText(day + "/" + month + "/" + year);
+            }
+        }
+
+    }
+
+    public void showDatePicker(View view){
+        DatePickerFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    public void submitRecord(View view){
+        //Get all inputs
+        String miles = milesInput.getText().toString();
+        String cost = costInput.getText().toString();
+
+        //Catch input errors
+        if(year == 0 || month == 0 || year == 0){
+            Toast.makeText(this, getString(R.string.date_input_error), Toast.LENGTH_LONG).show();
+        }
+        else if(miles.length() < 1 || miles.endsWith(".")) {
+            Toast.makeText(this, getString(R.string.miles_input_error), Toast.LENGTH_LONG).show();
+        }
+        else if(cost.length() < 1 || cost.endsWith(".")){
+            Toast.makeText(this, getString(R.string.cost_input_error), Toast.LENGTH_LONG).show();
+        }
+        else {
+            String date = parseDate(year, month, day, "-");
+
+            /*RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, addRecordUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.i(TAG, response);
+                            ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
+                            if(response.equals("-1")){
+                                //Display no records message
+                                TextView noRecordsTv = new TextView(OverviewActivity.this);
+                                noRecordsTv.setText(getResources().getString(R.string.no_records));
+                                nRecordsScroll.addView(noRecordsTv);
+                            }
+                            else {
+                                //Display heading
+                                TextView heading = (TextView) findViewById(R.id.last_n_records_heading);
+                                heading.setVisibility(View.VISIBLE);
+
+                                //Generate table from data
+                                nRecordsScroll.addView(parseJSONArray(response));
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //TODO handle error
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("plate",plate);
+                    params.put("date",limit);
+                    params.put("miles",limit);
+                    params.put("cost",limit);
+
+                    return params;
+                }
+            };
+            queue.add(stringRequest);*/
+        }
+    }
+
+    private String parseDate(int year, int month, int day, String delimeter){
+        return String.valueOf(year + delimeter + month + delimeter + day);
+    }
 }

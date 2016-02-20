@@ -16,9 +16,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/overview_name_title"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/default_name"
-        android:id="@+id/overview_name_title"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="center"
@@ -27,25 +29,94 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/last_n_records_heading"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/overview_heading_default"
-        android:id="@+id/last_n_records_heading"
         android:layout_below="@id/overview_name_title"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:visibility="gone"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/submit_record_btn"
+        android:layout_alignParentBottom="true"
+        android:text="@string/submit_btn_text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:background="@android:color/holo_green_dark"
+        android:layout_marginTop="10dp"
+        android:onClick="submitRecord"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/submit_record_btn"
+        android:id="@+id/miles_cost_layout">
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/miles_input"
+            android:inputType="numberDecimal"
+            android:hint="Miles"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/pale_grey"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cost_input"
+            android:inputType="numberDecimal"
+            android:hint="Cost"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/pale_grey"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/date_input_layout"
+        android:layout_above="@id/miles_cost_layout"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/date_input"
+            android:hint="Date"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center"
+            android:background="@color/pale_grey"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:onClick="showDatePicker" />
+
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/last_n_records_scroll"
         android:layout_below="@id/last_n_records_heading"
+        android:layout_above="@id/date_input_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp">
-
-    </ScrollView>
+        android:layout_marginRight="5dp" />
 
 </RelativeLayout>
