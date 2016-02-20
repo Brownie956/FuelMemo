@@ -212,6 +212,7 @@ public class OverviewActivity extends AppCompatActivity {
     private TableRow genColRow(String[] cols){
         TableRow colRow = new TableRow(this);
         for(String col : cols){
+            //For all columns required, make and style a text view and add to row
             TextView colName = new TextView(this);
             colName.setText(col);
             colName.setTextSize(15);
