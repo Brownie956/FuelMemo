@@ -193,6 +193,8 @@ public class VehiclesActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.vehicles_menu_add_vehicle:
+                Intent addVehicleIntent = new Intent(this, AddVehicleActivity.class);
+                startActivity(addVehicleIntent);
                 return true;
             case R.id.vehicles_menu_delete_vehicle:
                 return true;

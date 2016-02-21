@@ -39,6 +39,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cfbrownweb.fuelmemo.OverviewActivity" />
         </activity>
+        <activity
+            android:name=".AddVehicleActivity"
+            android:label="@string/title_activity_add_vehicle"
+            android:parentActivityName=".VehiclesActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cfbrownweb.fuelmemo.VehiclesActivity" />
+        </activity>
     </application>
 
 </manifest>

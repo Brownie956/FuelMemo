@@ -9,6 +9,7 @@
     <string name="default_name">Vehicle Name</string>
 
     <string name="vehicles_title">Your Vehicles</string>
+    <string name="add_vehicle_title">Add Vehicle</string>
     <string name="overview_title">Overview</string>
     <string name="all_records_title">All Records</string>
     <string name="net_retry_prompt">Unfortunately we are having trouble finding a network connection. Please check your network connection and click retry</string>
@@ -25,4 +26,8 @@
         Answering no will cancel this submission. You can manually remove submissions on the \'View all submissions\' page
     </string>
     <string name="title_activity_all_records">AllRecordsActivity</string>
+    <string name="title_activity_add_vehicle">AddVehicleActivity</string>
+    <string name="plate_input_hint">Enter vehicle plate</string>
+    <string name="name_input_hint">Enter vehicle name</string>
+    <string name="add_vehicle_btn">Submit</string>
 </resources>
