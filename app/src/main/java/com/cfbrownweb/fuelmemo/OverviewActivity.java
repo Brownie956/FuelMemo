@@ -3,6 +3,7 @@ package com.cfbrownweb.fuelmemo;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.text.style.TtsSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -38,6 +40,7 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -51,10 +54,12 @@ public class OverviewActivity extends AppCompatActivity {
 
     private final String lastNRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getLastNRecordsByPlate.php";
     private final String addRecordUrl = "http://cfbrownweb.ngrok.io/fuel/addRecord.php";
+    private final String getNumberOfRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getNumberOfRecords.php";
 
     private RelativeLayout overviewLayout;
     private String plate = "";
-    private final String limit = "40";
+    private final String limit = "6";
+    private final int maxRecords = 20;
     private String miles;
     private String cost;
     private static TextView dateInput;
@@ -74,6 +79,8 @@ public class OverviewActivity extends AppCompatActivity {
         dateInput = (TextView) findViewById(R.id.date_input);
         milesInput = (EditText) findViewById(R.id.miles_input);
         costInput = (EditText) findViewById(R.id.cost_input);
+        plate = getIntent().getStringExtra(VehiclesActivity.EXTRA_PLATE);
+        String name = getIntent().getStringExtra(VehiclesActivity.EXTRA_NAME);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,9 +89,6 @@ public class OverviewActivity extends AppCompatActivity {
 
         //Set titles
         TextView nameTitle = (TextView) findViewById(R.id.overview_name_title);
-        plate = getIntent().getStringExtra(VehiclesActivity.EXTRA_PLATE);
-        String name = getIntent().getStringExtra(VehiclesActivity.EXTRA_NAME);
-
         setTitle(plate.toUpperCase());
         nameTitle.setText(name);
 
@@ -276,9 +280,10 @@ public class OverviewActivity extends AppCompatActivity {
             else {
                 //Update editText
                 OverviewActivity.year = year;
-                OverviewActivity.month = month;
+                OverviewActivity.month = month + 1; //months start at 0
                 OverviewActivity.day = day;
-                dateInput.setText(day + "/" + month + "/" + year);
+                String formattedDate = OverviewActivity.day + "/" + OverviewActivity.month + "/" + OverviewActivity.year;
+                dateInput.setText(formattedDate);
             }
         }
 
@@ -289,44 +294,43 @@ public class OverviewActivity extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
-    public void submitRecord(View view){
+    private void submitRecord(){
         //Get all inputs
-        String miles = milesInput.getText().toString();
-        String cost = costInput.getText().toString();
+        final String miles = milesInput.getText().toString();
+        final String cost = costInput.getText().toString();
 
         //Catch input errors
-        if(year == 0 || month == 0 || year == 0){
+        if (year == 0 || month == 0 || day == 0) {
             Toast.makeText(this, getString(R.string.date_input_error), Toast.LENGTH_LONG).show();
-        }
-        else if(miles.length() < 1 || miles.endsWith(".")) {
+        } else if (miles.length() < 1 || miles.endsWith(".")) {
             Toast.makeText(this, getString(R.string.miles_input_error), Toast.LENGTH_LONG).show();
-        }
-        else if(cost.length() < 1 || cost.endsWith(".")){
+        } else if (cost.length() < 1 || cost.endsWith(".")) {
             Toast.makeText(this, getString(R.string.cost_input_error), Toast.LENGTH_LONG).show();
-        }
-        else {
-            String date = parseDate(year, month, day, "-");
+        } else {
+            final String date = parseDate(year, month, day, "-");
 
-            /*RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+            RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, addRecordUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.i(TAG, response);
                             ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
-                            if(response.equals("-1")){
-                                //Display no records message
-                                TextView noRecordsTv = new TextView(OverviewActivity.this);
-                                noRecordsTv.setText(getResources().getString(R.string.no_records));
-                                nRecordsScroll.addView(noRecordsTv);
-                            }
-                            else {
-                                //Display heading
-                                TextView heading = (TextView) findViewById(R.id.last_n_records_heading);
-                                heading.setVisibility(View.VISIBLE);
+                            if (response.equals("1")) {
+                                //Clear inputs
+                                dateInput.setText("");
+                                year = 0;
+                                month = 0;
+                                day = 0;
+                                milesInput.getText().clear();
+                                costInput.getText().clear();
 
-                                //Generate table from data
-                                nRecordsScroll.addView(parseJSONArray(response));
+                                //Update scroll elements - Remove all then recompute
+                                nRecordsScroll.removeAllViews();
+                                lastNRecordsReq();
+                            } else {
+                                //Something went wrong
+                                Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -339,19 +343,69 @@ public class OverviewActivity extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<String, String>();
-                    params.put("plate",plate);
-                    params.put("date",limit);
-                    params.put("miles",limit);
-                    params.put("cost",limit);
+                    params.put("plate", plate);
+                    params.put("date", date);
+                    params.put("miles", miles);
+                    params.put("cost", cost);
 
                     return params;
                 }
             };
-            queue.add(stringRequest);*/
+            queue.add(stringRequest);
         }
     }
 
     private String parseDate(int year, int month, int day, String delimeter){
         return String.valueOf(year + delimeter + month + delimeter + day);
+    }
+
+    public void checkLimitAndSubmit(View view){
+        RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getNumberOfRecordsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(TAG, "Number of Records: " + response);
+                        try {
+                            int numberOfRecords = Integer.parseInt(response);
+
+                            //Max number of records met?
+                            if(numberOfRecords > maxRecords){
+                                //Hide keyboard
+                                // Check if no view has focus:
+                                View view = OverviewActivity.this.getCurrentFocus();
+                                if (view != null) {
+                                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                }
+
+                                //Need to delete oldest record
+                                //TODO implement alert box - delete oldest or cancel
+                                Toast.makeText(OverviewActivity.this, "Need to delete oldest record", Toast.LENGTH_LONG).show();
+                            }
+                            else {
+                                submitRecord();
+                            }
+                        }
+                        catch(NumberFormatException e){
+                            Log.d(TAG, "Didn't parse response");
+                            //TODO handle exception
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO handle error
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("plate",plate);
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 }
