@@ -13,4 +13,8 @@
     <string name="date_input_error">Please select a valid date</string>
     <string name="miles_input_error">Please enter a valid miles value</string>
     <string name="cost_input_error">Please enter a valid cost value</string>
+    <string name="max_records_reached_message">
+        You have reached the maximum of 50 submissions for a single vehicle. Would you like to remove the oldest record?
+        Answering no will cancel this submission. You can manually remove submissions on the 'View all submissions' page
+    </string>
 </resources>

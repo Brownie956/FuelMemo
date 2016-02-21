@@ -5,13 +5,10 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
-import android.text.style.TtsSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -39,22 +36,19 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OverviewActivity extends AppCompatActivity {
+public class OverviewActivity extends AppCompatActivity implements MaxRecordsDialogFragment.MaxRecordsDialogListener {
 
     private final static String TAG = "cfbrownweb"; //debug tag
 
     private final String lastNRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getLastNRecordsByPlate.php";
     private final String addRecordUrl = "http://cfbrownweb.ngrok.io/fuel/addRecord.php";
     private final String getNumberOfRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getNumberOfRecords.php";
+    private final String removeOldestRecordUrl = "http://cfbrownweb.ngrok.io/fuel/deleteOldestRecord.php";
 
     private RelativeLayout overviewLayout;
     private String plate = "";
@@ -379,9 +373,9 @@ public class OverviewActivity extends AppCompatActivity {
                                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                                 }
 
-                                //Need to delete oldest record
-                                //TODO implement alert box - delete oldest or cancel
-                                Toast.makeText(OverviewActivity.this, "Need to delete oldest record", Toast.LENGTH_LONG).show();
+                                //Need to delete oldest record - show alert dialog
+                                MaxRecordsDialogFragment maxRecordsDialogFragment = new MaxRecordsDialogFragment();
+                                maxRecordsDialogFragment.show(getFragmentManager(), "MaxRecordsReachedDialog");
                             }
                             else {
                                 submitRecord();
@@ -390,6 +384,50 @@ public class OverviewActivity extends AppCompatActivity {
                         catch(NumberFormatException e){
                             Log.d(TAG, "Didn't parse response");
                             //TODO handle exception
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO handle error
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("plate",plate);
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        //Remove oldest record and store new one
+        removeOldestRecordAndSubmit();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        //Notify user that submission is cancelled
+        Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+    }
+
+    private void removeOldestRecordAndSubmit(){
+        RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, removeOldestRecordUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //Check for correct response
+                        if (response.equals("1")) {
+                            //Record deleted - Submit new record
+                            submitRecord();
+                        } else {
+                            //Something went wrong
+                            Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
