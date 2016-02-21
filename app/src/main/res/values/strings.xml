@@ -30,4 +30,8 @@
     <string name="plate_input_hint">Enter vehicle plate</string>
     <string name="name_input_hint">Enter vehicle name</string>
     <string name="add_vehicle_btn">Submit</string>
+    <string name="max_vehicles_reached_message">
+        You have reached the maximum of 10 vehicles.
+        Please remove a vehicle before adding another
+    </string>
 </resources>

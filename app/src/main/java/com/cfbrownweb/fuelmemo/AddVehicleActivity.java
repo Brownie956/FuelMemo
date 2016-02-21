@@ -3,12 +3,16 @@
 * Description: Activity class for adding a vehicle*/
 package com.cfbrownweb.fuelmemo;
 
+import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -23,14 +27,17 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddVehicleActivity extends AppCompatActivity {
+public class AddVehicleActivity extends AppCompatActivity implements MaxVehiclesDialogFragment.MaxVehiclesDialogListener {
 
     private static final String TAG = "cfbrownweb";
 
     private final String addVehicleUrl = "http://cfbrownweb.ngrok.io/fuel/addVehicle.php";
+    private final String getNumberOfVehiclesUrl = "http://cfbrownweb.ngrok.io/fuel/getNumberOfVehicles.php";
 
     private EditText plateInput;
     private EditText nameInput;
+
+    private final int maxVehicles = 10;
 
     private String plate;
     private String name;
@@ -66,8 +73,7 @@ public class AddVehicleActivity extends AppCompatActivity {
                         //Check for correct response
                         if (response.equals("1")) {
                             //success
-                            Intent vehiclesIntent = new Intent(AddVehicleActivity.this, VehiclesActivity.class);
-                            startActivity(vehiclesIntent);
+                            goToVehicles();
                         } else {
                             //Something went wrong
                             Toast.makeText(AddVehicleActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
@@ -104,13 +110,58 @@ public class AddVehicleActivity extends AppCompatActivity {
             plate = plateInput.getText().toString();
             name = nameInput.getText().toString();
 
-            //Clear inputs
-            plateInput.getText().clear();
-            nameInput.getText().clear();
+            RequestQueue queue = Volley.newRequestQueue(AddVehicleActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, getNumberOfVehiclesUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                int numberOfVehicles = Integer.parseInt(response);
 
-            //Send add vehicle request
-            addVehicleReq();
+                                //Max number of records met?
+                                if (numberOfVehicles >= maxVehicles) {
+                                    //Hide keyboard
+                                    // Check if no view has focus:
+                                    View view = AddVehicleActivity.this.getCurrentFocus();
+                                    if (view != null) {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                    }
+
+                                    //Need to delete oldest record - show alert dialog
+                                    MaxVehiclesDialogFragment maxVehiclesDialogFragment = new MaxVehiclesDialogFragment();
+                                    maxVehiclesDialogFragment.show(getFragmentManager(), "MaxVehiclesReachedDialog");
+                                } else {
+                                    //Clear inputs
+                                    plateInput.getText().clear();
+                                    nameInput.getText().clear();
+
+                                    //Send add vehicle request
+                                    addVehicleReq();
+                                }
+                            } catch (NumberFormatException e) {
+                                Log.d(TAG, "Didn't parse response");
+                                //TODO handle exception
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //TODO handle error
+                }
+            });
+            queue.add(stringRequest);
         }
     }
 
+    private void goToVehicles(){
+        Intent vehiclesIntent = new Intent(this, VehiclesActivity.class);
+        startActivity(vehiclesIntent);
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        //Don't add vehicle and go to vehicles page
+        goToVehicles();
+    }
 }
