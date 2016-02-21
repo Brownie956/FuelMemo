@@ -1,9 +1,15 @@
+/*Author: Chris Brown
+*Date: 21/02/2016
+*Description: Activity to show an overview of the current vehicle
+*Shows all records submitted for that vehicle and has functionality to
+*submit records for the current vehicle */
 package com.cfbrownweb.fuelmemo;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
@@ -52,6 +60,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
     private RelativeLayout overviewLayout;
     private String plate = "";
+    private String name = "";
     private final String limit = "6";
     private final int maxRecords = 20;
     private String miles;
@@ -73,8 +82,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         dateInput = (TextView) findViewById(R.id.date_input);
         milesInput = (EditText) findViewById(R.id.miles_input);
         costInput = (EditText) findViewById(R.id.cost_input);
-        plate = getIntent().getStringExtra(VehiclesActivity.EXTRA_PLATE);
-        String name = getIntent().getStringExtra(VehiclesActivity.EXTRA_NAME);
+        plate = Configuration.getConfig().getVehicle().getPlate();
+        name = Configuration.getConfig().getVehicle().getName();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,6 +103,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     }
 
     public void lastNRecordsReq() {
+        Log.i(TAG, "IN LAST N RECORDS REQ");
         RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, lastNRecordsUrl,
                 new Response.Listener<String>() {
@@ -138,8 +148,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private TableLayout parseJSONArray(String jString){
         TableLayout table = new TableLayout(this);
         //Add column names
-        String[] colunms = new String[]{"Date", "Miles", "Cost", "£ / 10 miles"};
-        table.addView(genColRow(colunms));
+        String[] columns = new String[]{"Date", "Miles", "Cost", "£ / 10 miles"};
+        table.addView(genColRow(columns));
 
         try {
             JSONArray jsonArray = new JSONArray(jString);
@@ -289,44 +299,105 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     }
 
     private void submitRecord(){
+        Log.i(TAG,"IN SUBMIT RECORD");
+        final String date = parseDate(year, month, day, "-");
+
+
+        RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, addRecordUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(TAG, response);
+                        ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
+                        if (response.equals("1")) {
+                            //Clear inputs
+                            dateInput.setText("");
+                            year = 0;
+                            month = 0;
+                            day = 0;
+                            milesInput.getText().clear();
+                            costInput.getText().clear();
+
+                            //Update scroll elements - Remove all then recompute
+                            nRecordsScroll.removeAllViews();
+                            lastNRecordsReq();
+                        } else {
+                            //Something went wrong
+                            Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO handle error
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("plate", plate);
+                params.put("date", date);
+                params.put("miles", miles);
+                params.put("cost", cost);
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    private String parseDate(int year, int month, int day, String delimeter){
+        Log.i(TAG, "IN PARSE DATE");
+        return String.valueOf(year + delimeter + month + delimeter + day);
+    }
+
+    public void checkLimitAndSubmit(View view){
         //Get all inputs
-        final String miles = milesInput.getText().toString();
-        final String cost = costInput.getText().toString();
+        miles = milesInput.getText().toString();
+        cost = costInput.getText().toString();
 
         //Catch input errors
         if (year == 0 || month == 0 || day == 0) {
             Toast.makeText(this, getString(R.string.date_input_error), Toast.LENGTH_LONG).show();
-        } else if (miles.length() < 1 || miles.endsWith(".")) {
+        }
+        else if (miles.length() < 1 || miles.endsWith(".")) {
             Toast.makeText(this, getString(R.string.miles_input_error), Toast.LENGTH_LONG).show();
-        } else if (cost.length() < 1 || cost.endsWith(".")) {
+        }
+        else if (cost.length() < 1 || cost.endsWith(".")) {
             Toast.makeText(this, getString(R.string.cost_input_error), Toast.LENGTH_LONG).show();
-        } else {
-            final String date = parseDate(year, month, day, "-");
-
+        }
+        else {
             RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, addRecordUrl,
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, getNumberOfRecordsUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.i(TAG, response);
-                            ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
-                            if (response.equals("1")) {
-                                //Clear inputs
-                                dateInput.setText("");
-                                year = 0;
-                                month = 0;
-                                day = 0;
-                                milesInput.getText().clear();
-                                costInput.getText().clear();
+                            Log.i(TAG, "Number of Records: " + response);
+                            try {
+                                int numberOfRecords = Integer.parseInt(response);
 
-                                //Update scroll elements - Remove all then recompute
-                                nRecordsScroll.removeAllViews();
-                                lastNRecordsReq();
-                            } else {
-                                //Something went wrong
-                                Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                                //Max number of records met?
+                                if (numberOfRecords >= maxRecords) {
+                                    //Hide keyboard
+                                    // Check if no view has focus:
+                                    View view = OverviewActivity.this.getCurrentFocus();
+                                    if (view != null) {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                    }
+
+                                    //Need to delete oldest record - show alert dialog
+                                    MaxRecordsDialogFragment maxRecordsDialogFragment = new MaxRecordsDialogFragment();
+                                    maxRecordsDialogFragment.show(getFragmentManager(), "MaxRecordsReachedDialog");
+                                } else {
+                                    submitRecord();
+                                }
+                            } catch (NumberFormatException e) {
+                                Log.d(TAG, "Didn't parse response");
+                                //TODO handle exception
                             }
-
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -338,69 +409,12 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<String, String>();
                     params.put("plate", plate);
-                    params.put("date", date);
-                    params.put("miles", miles);
-                    params.put("cost", cost);
 
                     return params;
                 }
             };
             queue.add(stringRequest);
         }
-    }
-
-    private String parseDate(int year, int month, int day, String delimeter){
-        return String.valueOf(year + delimeter + month + delimeter + day);
-    }
-
-    public void checkLimitAndSubmit(View view){
-        RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getNumberOfRecordsUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.i(TAG, "Number of Records: " + response);
-                        try {
-                            int numberOfRecords = Integer.parseInt(response);
-
-                            //Max number of records met?
-                            if(numberOfRecords > maxRecords){
-                                //Hide keyboard
-                                // Check if no view has focus:
-                                View view = OverviewActivity.this.getCurrentFocus();
-                                if (view != null) {
-                                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                                }
-
-                                //Need to delete oldest record - show alert dialog
-                                MaxRecordsDialogFragment maxRecordsDialogFragment = new MaxRecordsDialogFragment();
-                                maxRecordsDialogFragment.show(getFragmentManager(), "MaxRecordsReachedDialog");
-                            }
-                            else {
-                                submitRecord();
-                            }
-                        }
-                        catch(NumberFormatException e){
-                            Log.d(TAG, "Didn't parse response");
-                            //TODO handle exception
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO handle error
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("plate",plate);
-
-                return params;
-            }
-        };
-        queue.add(stringRequest);
     }
 
     @Override
@@ -416,6 +430,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     }
 
     private void removeOldestRecordAndSubmit(){
+        Log.i(TAG, "IN REMOVE OLDEST");
         RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, removeOldestRecordUrl,
                 new Response.Listener<String>() {
@@ -446,4 +461,31 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         };
         queue.add(stringRequest);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_overview, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.overview_menu_all_records:
+                Intent allRecIntent = new Intent(this, AllRecordsActivity.class);
+                startActivity(allRecIntent);
+                return true;
+            case R.id.overview_menu_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }

@@ -30,6 +30,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cfbrownweb.fuelmemo.VehiclesActivity" />
         </activity>
+        <activity
+            android:name=".AllRecordsActivity"
+            android:label="@string/all_records_title"
+            android:parentActivityName=".OverviewActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cfbrownweb.fuelmemo.OverviewActivity" />
+        </activity>
     </application>
 
 </manifest>

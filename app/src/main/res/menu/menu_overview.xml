@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cfbrownweb.fuelmemo.OverviewActivity" >
+    <item android:id="@+id/overview_menu_all_records"
+        android:title="@string/menu_item_all_records"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+    <item android:id="@+id/overview_menu_settings"
+        android:title="@string/menu_item_settings"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+</menu>

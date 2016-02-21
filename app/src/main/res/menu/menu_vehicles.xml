@@ -2,8 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.cfbrownweb.fuelmemo.VehiclesActivity" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
+    <item android:id="@+id/vehicles_menu_add_vehicle"
+        android:title="@string/menu_item_add_vehicle"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+    <item android:id="@+id/vehicles_menu_delete_vehicle"
+        android:title="@string/menu_item_delete_vehicle"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+    <item android:id="@+id/vehicles_menu_settings"
+        android:title="@string/menu_item_settings"
+        android:orderInCategory="3"
         app:showAsAction="never" />
 </menu>

@@ -38,9 +38,6 @@ public class VehiclesActivity extends AppCompatActivity {
 
     private final static String TAG = "cfbrownweb"; //debug tag
 
-    public static final String EXTRA_PLATE = "com.cfbrownweb.fuelmemo.PLATE";
-    public static final String EXTRA_NAME = "com.cfbrownweb.fuelmemo.NAME";
-
     private final String allVehiclesUrl = "http://cfbrownweb.ngrok.io/fuel/getAllVehicles.php";
 
     private RelativeLayout vehiclesContent;
@@ -55,15 +52,6 @@ public class VehiclesActivity extends AppCompatActivity {
         vehiclesContent = (RelativeLayout) findViewById(R.id.vehicles_content_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         if(isConnected()) {
             //Get all of the vehicles and display
@@ -159,9 +147,11 @@ public class VehiclesActivity extends AppCompatActivity {
     }
 
     private void goToOverview(String plate, String name){
+        //Store vehicle in config
+        Vehicle vehicle = new Vehicle(plate, name);
+        Configuration.getConfig().setVehicle(vehicle);
+
         Intent intent = new Intent(this, OverviewActivity.class);
-        intent.putExtra(EXTRA_PLATE, plate);
-        intent.putExtra(EXTRA_NAME, name);
         startActivity(intent);
     }
 
@@ -201,11 +191,15 @@ public class VehiclesActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.vehicles_menu_add_vehicle:
+                return true;
+            case R.id.vehicles_menu_delete_vehicle:
+                return true;
+            case R.id.vehicles_menu_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cfbrownweb.fuelmemo.AllRecordsActivity" >
+    <item android:id="@+id/all_records_menu_del_records"
+        android:title="@string/menu_item_delete_records"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+    <item android:id="@+id/all_records_menu_settings"
+        android:title="@string/menu_item_settings"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+</menu>
