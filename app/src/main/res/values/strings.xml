@@ -34,4 +34,5 @@
         You have reached the maximum of 10 vehicles.
         Please remove a vehicle before adding another
     </string>
+    <string name="submit_cancel">Cancelled</string>
 </resources>
