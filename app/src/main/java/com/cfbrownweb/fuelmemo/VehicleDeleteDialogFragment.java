@@ -96,7 +96,7 @@ public class VehicleDeleteDialogFragment extends DialogFragment {
         //Put all the values into the itemStrings array
         int i = 0;
         for(HashMap.Entry<String, String> entry : items.entrySet()){
-            itemStrings[i] = entry.getKey() + "\n" + entry.getValue();
+            itemStrings[i] = entry.getKey().toUpperCase() + "\n" + entry.getValue();
             i++;
         }
         return itemStrings;
