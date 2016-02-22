@@ -3,10 +3,8 @@
 *Description: Activity that displays all of the records for the current vehicle*/
 package com.cfbrownweb.fuelmemo;
 
-import android.content.Intent;
+import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -34,21 +33,28 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class AllRecordsActivity extends AppCompatActivity {
+public class AllRecordsActivity extends AppCompatActivity implements RecordDeleteDialogFragment.DeleteRecDialogListener,
+DelRecordConfDialogFragment.confirmDelDialogListener {
 
     private static final String TAG = "cfbrownweb";
 
     private final String getAllRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getAllRecordsByPlate.php";
+    private final String deleteRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/deleteRecords.php";
     private String plate = "";
     private String name = "";
+    private ArrayList<Record> records;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_records);
+
+        records = new ArrayList<Record>();
 
         plate = Configuration.getConfig().getVehicle().getPlate();
         name = Configuration.getConfig().getVehicle().getName();
@@ -83,12 +89,19 @@ public class AllRecordsActivity extends AppCompatActivity {
                             allRecordsScroll.addView(noRecordsTv);
                         }
                         else {
+
+                            //Create and store Record objects
+                            parseJSONToList(response);
+
+                            //Clear anything in scroll
+                            allRecordsScroll.removeAllViews();
+
                             //Display heading
                             TextView heading = (TextView) findViewById(R.id.all_records_heading);
                             heading.setVisibility(View.VISIBLE);
 
                             //Generate table from data
-                            allRecordsScroll.addView(parseJSONArray(response));
+                            allRecordsScroll.addView(parseJSONArrayToTable(response));
                         }
 
                     }
@@ -109,7 +122,51 @@ public class AllRecordsActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private TableLayout parseJSONArray(String jString){
+    public void deleteRecords(final ArrayList<Record> recordsToDelete) {
+        RequestQueue queue = Volley.newRequestQueue(AllRecordsActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, deleteRecordsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //Check for success
+                        if(response.equals("1")){
+                            //Remove the records from records list
+                            for(Record record : recordsToDelete){
+                                records.remove(record);
+                            }
+
+                            //Reload the records list
+                            allRecordsReq();
+                        }
+                        else {
+                            //Something went wrong
+                            Toast.makeText(AllRecordsActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO handle error
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("plate", Configuration.getConfig().getVehicle().getPlate());
+
+                int i = 0;
+                for(Record record : recordsToDelete) {
+                    params.put("dates["+i+"]", record.getDate());
+                    i++;
+                }
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    private TableLayout parseJSONArrayToTable(String jString){
         TableLayout table = new TableLayout(this);
         //Add column names
         String[] columns = new String[]{"Date", "Miles", "Cost", "£ / 10 miles"};
@@ -195,6 +252,26 @@ public class AllRecordsActivity extends AppCompatActivity {
         return table;
     }
 
+    private void parseJSONToList(String jArray){
+        Vehicle currentVehicle = Configuration.getConfig().getVehicle();
+        try {
+            JSONArray jsonArray = new JSONArray(jArray);
+
+            for(int i = 0; i < jArray.length(); i++){
+                //Get values from array
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String date = jsonObject.getString("date");
+                double miles = Double.parseDouble(jsonObject.getString("miles"));
+                double cost = Double.parseDouble(jsonObject.getString("cost"));
+                //Create new Record object and store
+                records.add(new Record(currentVehicle, date, miles, cost));
+            }
+        }
+        catch (JSONException e){
+            //TODO handle exception
+        }
+    }
+
     /*Function taken from http://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places*/
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -221,6 +298,26 @@ public class AllRecordsActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onDialogPositiveClick(DialogFragment dialog, ArrayList<Record> selectedItems) {
+        //Confirm delete
+        DelRecordConfDialogFragment delRecConfDialog = new DelRecordConfDialogFragment();
+        delRecConfDialog.setItems(selectedItems);
+        delRecConfDialog.show(getFragmentManager(), "delRecConfDialog");
+    }
+
+    @Override
+    public void onDialogDeleteClick(DialogFragment dialog, ArrayList<Record> selectedItems) {
+        //Delete records
+        deleteRecords(selectedItems);
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        //Cancel
+        Toast.makeText(this, getString(R.string.submit_cancel), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_all_records, menu);
@@ -236,6 +333,9 @@ public class AllRecordsActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.all_records_menu_del_records:
+                RecordDeleteDialogFragment recDelDialogFragment = new RecordDeleteDialogFragment();
+                recDelDialogFragment.setItems(records);
+                recDelDialogFragment.show(getFragmentManager(), "recDelDialog");
                 return true;
             case R.id.all_records_menu_settings:
                 return true;

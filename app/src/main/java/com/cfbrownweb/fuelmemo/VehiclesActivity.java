@@ -45,7 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VehiclesActivity extends AppCompatActivity implements VehicleDeleteDialogFragment.DeleteDialogListener,
-        DeleteConfirmationDialogFragment.confirmDelDialogListener {
+        DelVehicleConfDialogFragment.confirmDelDialogListener {
 
     private final static String TAG = "cfbrownweb"; //debug tag
 
@@ -257,7 +257,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, ArrayList<String> selectedItems) {
         //Are you sure? - Confirmation
-        DeleteConfirmationDialogFragment delConf = new DeleteConfirmationDialogFragment();
+        DelVehicleConfDialogFragment delConf = new DelVehicleConfDialogFragment();
 
         //Store selected vehicles in hashmap with associated name
         LinkedHashMap<String, String> delVehicles = new LinkedHashMap<String,String>();

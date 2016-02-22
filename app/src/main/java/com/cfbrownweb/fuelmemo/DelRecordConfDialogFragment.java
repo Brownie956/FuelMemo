@@ -1,6 +1,6 @@
 /*Author: Chris Brown
 * Date: 22/02/2016
-* Description: Fragment class for confirmation dialog when deleting vehicles*/
+* Description: Fragment class for confirmation dialog when deleting records*/
 package com.cfbrownweb.fuelmemo;
 
 import android.app.Activity;
@@ -14,27 +14,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class DeleteConfirmationDialogFragment extends DialogFragment {
+public class DelRecordConfDialogFragment extends DialogFragment {
     private static final String TAG = "cfbrownweb";
 
-    private LinkedHashMap<String,String> items; //Items queued for delete
-    private ArrayList<String> delPlates;
+    private ArrayList<Record> items; //Items queued for delete
 
-    public DeleteConfirmationDialogFragment(){
-        this.items = new LinkedHashMap<String,String>();
-        this.delPlates = new ArrayList<String>();
+    public DelRecordConfDialogFragment(){
+        this.items = new ArrayList<Record>();
     }
 
-    public void setItems(LinkedHashMap<String, String> items) {
+    public void setItems(ArrayList<Record> items) {
         this.items = items;
-        for(String plate : items.keySet()){
-            delPlates.add(plate);
-        }
-
     }
 
     public interface confirmDelDialogListener {
-        public void onDialogDeleteClick(DialogFragment dialog, ArrayList<String> selectedItems);
+        public void onDialogDeleteClick(DialogFragment dialog, ArrayList<Record> selectedItems);
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 
@@ -57,18 +51,18 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Are you sure?")
-                .setMessage("Are you sure you want to delete the following vehicles:\n" + constructDelQueueString())
+        builder.setTitle("Are you sure?") //TODO Change to string
+                .setMessage("Are you sure you want to delete the following records:\n" + constructDelQueueString())
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogDeleteClick(DeleteConfirmationDialogFragment.this, delPlates);
+                        mListener.onDialogDeleteClick(DelRecordConfDialogFragment.this, items);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogNegativeClick(DeleteConfirmationDialogFragment.this);
+                        mListener.onDialogNegativeClick(DelRecordConfDialogFragment.this);
                     }
                 });
 
@@ -79,21 +73,27 @@ public class DeleteConfirmationDialogFragment extends DialogFragment {
     private String constructDelQueueString(){
         StringBuilder sb = new StringBuilder();
         int i = 1;
-        for(Map.Entry<String, String> vehicle : items.entrySet()){
+        for(Record record : items){
             sb.append(i);
             sb.append(". ");
-            sb.append(vehicle.getKey().toUpperCase());
+            sb.append(record.getDate());
             sb.append("\n");
-            sb.append(vehicle.getValue());
-            sb.append("\n");
+            sb.append(record.getMiles());
+            sb.append(" miles");
+            sb.append("\n£");
+            sb.append(record.getCost());
+            sb.append("\n\n");
             i++;
         }
 
         /*Creates this:
-        * 1. PLATE 1
-        * NAME 1
-        * 2. PLATE 2
-        * NAME 2
+        * 1. DATE 1
+        * MILES 1
+        * COST 1
+        *
+        * 2. DATE 2
+        * MILES 2
+        * COST 2
         * etc...*/
 
         return sb.toString();
