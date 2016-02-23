@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -61,7 +62,6 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private RelativeLayout overviewLayout;
     private String plate = "";
     private String name = "";
-    private final String limit = "6";
     private final int maxRecords = 20;
     private String miles;
     private String cost;
@@ -69,6 +69,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private EditText milesInput;
     private EditText costInput;
     private static int year, month, day;
+    private boolean nRecordsComputed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,14 +96,14 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         setTitle(plate.toUpperCase());
         nameTitle.setText(name);
 
-        lastNRecordsReq();
+        lastNRecordsReq(String.valueOf(getLimit()));
 
         nameTitle.requestFocus();
         milesInput.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4, 2)});
         costInput.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4, 2)});
     }
 
-    public void lastNRecordsReq() {
+    public void lastNRecordsReq(final String limit) {
         Log.i(TAG, "IN LAST N RECORDS REQ");
         RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, lastNRecordsUrl,
@@ -124,6 +125,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
                             //Generate table from data
                             nRecordsScroll.addView(parseJSONArray(response));
+                            nRecordsComputed = true;
                         }
 
                     }
@@ -309,7 +311,6 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                     @Override
                     public void onResponse(String response) {
                         Log.i(TAG, response);
-                        ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
                         if (response.equals("1")) {
                             //Clear inputs
                             dateInput.setText("");
@@ -320,8 +321,9 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                             costInput.getText().clear();
 
                             //Update scroll elements - Remove all then recompute
-                            nRecordsScroll.removeAllViews();
-                            lastNRecordsReq();
+                            clearNRecordsScroll();
+
+                            lastNRecordsReq(String.valueOf(getLimit()));
                         } else {
                             //Something went wrong
                             Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
@@ -462,6 +464,17 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         queue.add(stringRequest);
     }
 
+    private int getLimit(){
+        SharedPreferences settings = Configuration.getConfig().getSharedPrefs(this);
+        int nRecordsLimit = settings.getInt("nRecords", 3);
+        return nRecordsLimit;
+    }
+
+    private void clearNRecordsScroll(){
+        ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
+        nRecordsScroll.removeAllViews();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -490,4 +503,15 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         }
     }
 
+    @Override
+    protected void onResume() {
+        //Only recompute if it's not the first time
+        //onCreate will compute it for the first time
+        if(nRecordsComputed){
+            //Clear Scroll and Recompute
+            clearNRecordsScroll();
+            lastNRecordsReq(String.valueOf(getLimit()));
+        }
+        super.onResume();
+    }
 }

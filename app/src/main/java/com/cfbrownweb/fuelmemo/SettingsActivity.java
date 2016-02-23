@@ -142,6 +142,11 @@ public class SettingsActivity extends AppCompatActivity {
         np.setMaxValue(10);
         np.setWrapSelectorWheel(false);
 
+        //Set to previous value or 3 otherwise
+        final SharedPreferences settings = Configuration.getConfig().getSharedPrefs(this);
+        int startVal = settings.getInt("nRecords", 3);
+        np.setValue(startVal);
+
         Button cancelBtn = (Button) npDialog.findViewById(R.id.np_cancel_button);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,7 +163,6 @@ public class SettingsActivity extends AppCompatActivity {
                 nRecordsValueTv.setText(String.valueOf(np.getValue()));
 
                 //Store number selected
-                SharedPreferences settings = Configuration.getConfig().getSharedPrefs(SettingsActivity.this);
                 SharedPreferences.Editor prefEditor = settings.edit();
                 prefEditor.putInt("nRecords", np.getValue());
                 prefEditor.apply();

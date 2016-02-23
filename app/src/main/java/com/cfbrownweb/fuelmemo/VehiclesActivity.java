@@ -56,6 +56,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     private TextView connectionPrompt;
     private Button connectionRetryButton;
     private LinkedHashMap<String, String> vehicles;
+    private ListView vehicleListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +133,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
 
                         //Add all returned vehicles to the list view
                         ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, returnedResponse);
-                        ListView vehicleListView = (ListView) findViewById(R.id.vehicle_list);
+                        vehicleListView = (ListView) findViewById(R.id.vehicle_list);
                         vehicleListView.setAdapter(vehicleAdaptor);
 
                         //Click listener on each item
@@ -313,5 +314,13 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        if(vehicleListView != null){
+            vehicleListView.invalidateViews();
+        }
+        super.onResume();
     }
 }
