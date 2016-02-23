@@ -62,7 +62,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private RelativeLayout overviewLayout;
     private String plate = "";
     private String name = "";
-    private final int maxRecords = 20;
+    private final int maxRecords = 50;
     private String miles;
     private String cost;
     private static TextView dateInput;
@@ -405,6 +405,12 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //TODO handle error
+                    if(error.networkResponse == null){
+                        Log.i(TAG, "No Network");
+                    }
+                    else {
+                        //Something else happened
+                    }
                 }
             }) {
                 @Override
@@ -491,7 +497,9 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
         switch (id) {
             case R.id.overview_menu_all_records:
-                Intent allRecIntent = new Intent(this, AllRecordsActivity.class);
+                //Catch connection error
+                Intent allRecIntent = new Intent(this, ConnectionActivity.class);
+                allRecIntent.putExtra("dest", AllRecordsActivity.class);
                 startActivity(allRecIntent);
                 return true;
             case R.id.overview_menu_settings:

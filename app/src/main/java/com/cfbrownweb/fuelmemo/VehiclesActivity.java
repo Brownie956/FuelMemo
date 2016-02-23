@@ -1,6 +1,6 @@
 /*Author: Chris Brown
 * Date: 18/02/2016
-* Description: Launcher activity. Connects to db, pulls all vehicles and displays them
+* Description: Connects to db, pulls all vehicles and displays them
 * Also implements functionality for deleting vehicles*/
 package com.cfbrownweb.fuelmemo;
 
@@ -53,67 +53,24 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     private final String deleteVehiclesUrl = "http://cfbrownweb.ngrok.io/fuel/deleteVehicles.php";
 
     private RelativeLayout vehiclesContent;
-    private TextView connectionPrompt;
-    private Button connectionRetryButton;
-    private LinkedHashMap<String, String> vehicles;
+    private LinkedHashMap<String, String> vehicles; //TODO change to arraylist<Vehicle>
     private ListView vehicleListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vehicles);
+
+        //Initial setup
         setTitle(getResources().getString(R.string.vehicles_title));
         vehiclesContent = (RelativeLayout) findViewById(R.id.vehicles_content_layout);
         vehicles = new LinkedHashMap<String, String>();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(isConnected()) {
-            //Get all of the vehicles and display
-            allVehiclesReq();
-        }
-        else {
-            //TODO move to own toggle function
-            connectionPrompt = new TextView(this);
-            connectionRetryButton = new Button(this);
-
-            //Set prompt text properties
-            connectionPrompt.setText(getResources().getString(R.string.net_retry_prompt));
-            connectionPrompt.setTextSize(17);
-            connectionPrompt.setGravity(Gravity.CENTER);
-
-            //prompt layout details
-            RelativeLayout.LayoutParams promptDetails = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            promptDetails.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            promptDetails.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            promptDetails.setMargins(100, 150, 100, 50);
-
-            //set retry button properties
-            connectionRetryButton.setText(getResources().getString(R.string.net_con_btn_text));
-
-            RelativeLayout.LayoutParams retryBtnDetails = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            retryBtnDetails.addRule(RelativeLayout.CENTER_VERTICAL);
-            retryBtnDetails.addRule(RelativeLayout.CENTER_HORIZONTAL);
-
-            //Retry connection when button is clicked
-            connectionRetryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    retryNet();
-                }
-            });
-
-            vehiclesContent.addView(connectionPrompt, promptDetails);
-            vehiclesContent.addView(connectionRetryButton, retryBtnDetails);
-        }
+        //Get all of the vehicles and display
+        allVehiclesReq();
     }
 
     public void allVehiclesReq() {
@@ -214,30 +171,9 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         Vehicle vehicle = new Vehicle(plate, name);
         Configuration.getConfig().setVehicle(vehicle);
 
-        Intent intent = new Intent(this, OverviewActivity.class);
+        Intent intent = new Intent(this, ConnectionActivity.class);
+        intent.putExtra("dest", OverviewActivity.class);
         startActivity(intent);
-    }
-
-    private void retryNet(){
-        //Get connection status and decide what to do
-        if(!isConnected()){
-            Toast.makeText(this,"No internet connection", Toast.LENGTH_LONG).show();
-        }
-        else {
-            //Remove connection prompt
-            vehiclesContent.removeView(connectionPrompt);
-            vehiclesContent.removeView(connectionRetryButton);
-
-            //Get all of the vehicles and display
-            allVehiclesReq();
-        }
-    }
-
-    private boolean isConnected(){
-        //Get network information
-        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     private void storeVehiclesInHashMap(JSONArray vehicles){
@@ -318,6 +254,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "onResume");
         if(vehicleListView != null){
             vehicleListView.invalidateViews();
         }
