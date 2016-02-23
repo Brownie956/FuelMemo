@@ -307,6 +307,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                 deleteDialogFragment.show(getFragmentManager(), "deleteVehicleDialog");
                 return true;
             case R.id.vehicles_menu_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

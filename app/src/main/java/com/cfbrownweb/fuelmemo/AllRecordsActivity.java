@@ -4,6 +4,7 @@
 package com.cfbrownweb.fuelmemo;
 
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -338,6 +339,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                 recDelDialogFragment.show(getFragmentManager(), "recDelDialog");
                 return true;
             case R.id.all_records_menu_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

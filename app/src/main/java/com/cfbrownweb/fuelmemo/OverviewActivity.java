@@ -482,6 +482,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 startActivity(allRecIntent);
                 return true;
             case R.id.overview_menu_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

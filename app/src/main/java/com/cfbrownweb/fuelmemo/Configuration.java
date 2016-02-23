@@ -3,6 +3,9 @@
 *Description: A class to store configuration setting */
 package com.cfbrownweb.fuelmemo;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 public class Configuration {
     private static Configuration sessionInstance = new Configuration();
 
@@ -22,4 +25,9 @@ public class Configuration {
     public Vehicle getVehicle(){
         return vehicle;
     }
+
+    public SharedPreferences getSharedPrefs(Context context){
+        return context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+    }
+
 }

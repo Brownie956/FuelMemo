@@ -35,4 +35,14 @@
         Please remove a vehicle before adding another
     </string>
     <string name="submit_cancel">Cancelled</string>
+    <string name="settings_title">Settings</string>
+
+    <string name="settings_vehicle_heading">Vehicles Page</string>
+    <string name="settings_tile_heading">Tile Colour - This is the background colour of vehicle tiles</string>
+    <string name="settings_overview_heading">Overview Page</string>
+    <string name="settings_n_records_heading">Number of previous records - This is the number of previous records on the overview page</string>
+    <string name="settings_n_records_dialog_title">Number of records</string>
+    <string name="settings_n_records_cancel">Cancel</string>
+    <string name="settings_n_records_set">Set</string>
+
 </resources>
