@@ -8,7 +8,7 @@
     <color name="grey">#B3B3B3</color>
 
     <color name="tile_grey">#E6E6E6</color>
-    <color name="tile_blue">#444DDD</color>
-    <color name="tile_green">#2AA92A</color>
-    <color name="tile_red">#D92F2F</color>
+    <color name="tile_blue">#91444ddd</color>
+    <color name="tile_green">#912aa92a</color>
+    <color name="tile_red">#91d92f2f</color>
 </resources>
