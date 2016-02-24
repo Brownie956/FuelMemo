@@ -11,8 +11,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class DelRecordConfDialogFragment extends DialogFragment {
     private static final String TAG = "cfbrownweb";

@@ -12,10 +12,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.NoSuchElementException;
 
 public class RecordDeleteDialogFragment extends DialogFragment {
     private static final String TAG = "cfbrownweb";

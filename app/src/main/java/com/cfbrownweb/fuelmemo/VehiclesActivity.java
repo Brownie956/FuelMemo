@@ -5,20 +5,15 @@
 package com.cfbrownweb.fuelmemo;
 
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -40,8 +35,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VehiclesActivity extends AppCompatActivity implements VehicleDeleteDialogFragment.DeleteDialogListener,

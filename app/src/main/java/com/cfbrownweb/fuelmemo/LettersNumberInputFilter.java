@@ -7,6 +7,7 @@ package com.cfbrownweb.fuelmemo;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
