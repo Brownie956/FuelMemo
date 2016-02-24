@@ -52,6 +52,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     private final String allVehiclesUrl = "http://cfbrownweb.ngrok.io/fuel/getAllVehicles.php";
     private final String deleteVehiclesUrl = "http://cfbrownweb.ngrok.io/fuel/deleteVehicles.php";
 
+    private Menu optionsMenu;
     private RelativeLayout vehiclesContent;
     private LinkedHashMap<String, String> vehicles; //TODO change to arraylist<Vehicle>
     private ListView vehicleListView;
@@ -80,6 +81,9 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                     @Override
                     public void onResponse(JSONArray response) {
                         Log.i(TAG, response.toString());
+
+                        //Reset refresh icon
+                        Utils.setRefreshIconState(false, optionsMenu);
 
                         final JSONArray returnedResponse = response;
 
@@ -117,6 +121,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             @Override
             public void onErrorResponse(VolleyError error) {
                 //TODO handle error
+                //Reset refresh icon
+                Utils.setRefreshIconState(false, optionsMenu);
             }
         }
         );
@@ -223,6 +229,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_vehicles, menu);
+        this.optionsMenu = menu;
         return true;
     }
 
@@ -246,6 +253,10 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             case R.id.vehicles_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.menu_refresh:
+                Utils.setRefreshIconState(true, optionsMenu);
+                allVehiclesReq();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

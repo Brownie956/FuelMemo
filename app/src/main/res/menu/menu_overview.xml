@@ -2,6 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.cfbrownweb.fuelmemo.OverviewActivity" >
+    <item android:id="@+id/menu_refresh"
+        android:title="@string/menu_item_refresh"
+        android:icon="@drawable/refreshiconwhite"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom" />
     <item android:id="@+id/overview_menu_all_records"
         android:title="@string/menu_item_all_records"
         android:orderInCategory="1"

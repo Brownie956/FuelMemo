@@ -46,6 +46,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
 
     private final String getAllRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getAllRecordsByPlate.php";
     private final String deleteRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/deleteRecords.php";
+
+    private Menu optionsMenu;
     private String plate = "";
     private String name = "";
     private ArrayList<Record> records;
@@ -81,6 +83,9 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Reset refresh icon
+                        Utils.setRefreshIconState(false, optionsMenu);
+
                         Log.i(TAG, response);
                         ScrollView allRecordsScroll = (ScrollView) findViewById(R.id.all_records_scroll);
                         if(response.equals("-1")){
@@ -110,6 +115,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //TODO handle error
+                //Reset refresh icon
+                Utils.setRefreshIconState(false, optionsMenu);
             }
         }) {
             @Override
@@ -322,6 +329,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_all_records, menu);
+        optionsMenu = menu;
         return true;
     }
 
@@ -341,6 +349,10 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             case R.id.all_records_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.menu_refresh:
+                Utils.setRefreshIconState(true, optionsMenu);
+                allRecordsReq();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

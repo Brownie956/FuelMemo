@@ -59,6 +59,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private final String getNumberOfRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getNumberOfRecords.php";
     private final String removeOldestRecordUrl = "http://cfbrownweb.ngrok.io/fuel/deleteOldestRecord.php";
 
+    private Menu optionsMenu;
     private RelativeLayout overviewLayout;
     private String plate = "";
     private String name = "";
@@ -110,6 +111,9 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Reset refresh icon
+                        Utils.setRefreshIconState(false, optionsMenu);
+
                         Log.i(TAG, response);
                         ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
                         if(response.equals("-1")){
@@ -133,6 +137,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             @Override
             public void onErrorResponse(VolleyError error) {
                 //TODO handle error
+                //Reset refresh icon
+                Utils.setRefreshIconState(false, optionsMenu);
             }
         }) {
             @Override
@@ -485,6 +491,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_overview, menu);
+        optionsMenu = menu;
         return true;
     }
 
@@ -505,6 +512,10 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             case R.id.overview_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.menu_refresh:
+                Utils.setRefreshIconState(true, optionsMenu);
+                lastNRecordsReq(String.valueOf(getLimit()));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
