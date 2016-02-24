@@ -17,24 +17,18 @@ import java.util.Map;
 public class DelVehicleConfDialogFragment extends DialogFragment {
     private static final String TAG = "cfbrownweb";
 
-    private LinkedHashMap<String,String> items; //Items queued for delete
-    private ArrayList<String> delPlates;
+    private ArrayList<Vehicle> itemsAL; //Items queued for delete
 
     public DelVehicleConfDialogFragment(){
-        this.items = new LinkedHashMap<String,String>();
-        this.delPlates = new ArrayList<String>();
+        this.itemsAL = new ArrayList<Vehicle>();
     }
 
-    public void setItems(LinkedHashMap<String, String> items) {
-        this.items = items;
-        for(String plate : items.keySet()){
-            delPlates.add(plate);
-        }
-
+    public void setItems(ArrayList<Vehicle> items) {
+        this.itemsAL = items;
     }
 
     public interface confirmDelDialogListener {
-        public void onDialogDeleteClick(DialogFragment dialog, ArrayList<String> selectedItems);
+        public void onDialogDeleteClick(DialogFragment dialog, ArrayList<Vehicle> selectedItems);
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 
@@ -57,12 +51,12 @@ public class DelVehicleConfDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Are you sure?") //TODO Change to string
-                .setMessage("Are you sure you want to delete the following vehicles:\n" + constructDelQueueString())
+        builder.setTitle(getString(R.string.del_conf_title))
+                .setMessage(getString(R.string.del_veh_conf_message) + "\n" + constructDelQueueString())
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogDeleteClick(DelVehicleConfDialogFragment.this, delPlates);
+                        mListener.onDialogDeleteClick(DelVehicleConfDialogFragment.this, itemsAL);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -79,12 +73,12 @@ public class DelVehicleConfDialogFragment extends DialogFragment {
     private String constructDelQueueString(){
         StringBuilder sb = new StringBuilder();
         int i = 1;
-        for(Map.Entry<String, String> vehicle : items.entrySet()){
+        for(Vehicle vehicle : itemsAL){
             sb.append(i);
             sb.append(". ");
-            sb.append(vehicle.getKey().toUpperCase());
+            sb.append(vehicle.getPlate().toUpperCase());
             sb.append("\n");
-            sb.append(vehicle.getValue());
+            sb.append(vehicle.getName());
             sb.append("\n");
             i++;
         }

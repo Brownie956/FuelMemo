@@ -45,7 +45,8 @@ class VehicleAdapter extends ArrayAdapter<String> {
             name = jArray.getJSONObject(position).getString("name");
         }
         catch (JSONException e){
-            //TODO Handle Excepetion
+            //JSON error - server-side error
+            Utils.serverErrorToast(context);
         }
         TextView rowPlate = (TextView) customView.findViewById(R.id.row_plate);
         TextView rowVehicleName = (TextView) customView.findViewById(R.id.row_vehicle_name);

@@ -24,6 +24,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +67,17 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
     }
 
     private void addVehicleReq(){
+        //Is it a duplicate entry?
+        for(Vehicle vehicle : VehiclesActivity.vehiclesAL){
+            Log.i(TAG, vehicle.getPlate() + "\n");
+            //Loop over vehicles looking for plate
+            if(vehicle.getPlate().equals(plate)){
+                //Duplicate entry
+                Toast.makeText(this, plate.toUpperCase() + " already exists", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
         RequestQueue queue = Volley.newRequestQueue(AddVehicleActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, addVehicleUrl,
                 new Response.Listener<String>() {
@@ -75,8 +88,8 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                             //success
                             goToVehicles();
                         } else {
-                            //TODO handle if duplicate entry
-                            Toast.makeText(AddVehicleActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                            //Something went wrong
+                            Utils.serverErrorToast(AddVehicleActivity.this);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -114,7 +127,8 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
         }
         else {
             //get input values
-            plate = plateInput.getText().toString();
+            plate = plateInput.getText().toString().toLowerCase();
+            plate = plate.replaceAll("\\s+", ""); //remove spaces
             name = nameInput.getText().toString();
 
             RequestQueue queue = Volley.newRequestQueue(AddVehicleActivity.this);

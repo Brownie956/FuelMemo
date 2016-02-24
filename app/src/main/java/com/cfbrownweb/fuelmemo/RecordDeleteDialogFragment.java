@@ -56,7 +56,7 @@ public class RecordDeleteDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Which to delete?") //TODO change to string
+        builder.setTitle(getString(R.string.del_rec_title))
                 .setMultiChoiceItems(genItemStrings(items), null, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {

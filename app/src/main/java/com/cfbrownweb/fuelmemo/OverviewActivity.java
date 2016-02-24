@@ -242,7 +242,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             }
         }
         catch (JSONException e){
-            //TODO Handle Exception
+            //JSON problem - Server-side error
+            Utils.serverErrorToast(this);
         }
         return table;
     }
@@ -419,7 +420,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                                 }
                             } catch (NumberFormatException e) {
                                 Log.d(TAG, "Didn't parse response");
-                                //TODO handle exception - server error
+                                //Server didn't return int - Server-side error
+                                Utils.serverErrorToast(OverviewActivity.this);
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -471,8 +473,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                             //Record deleted - Submit new record
                             submitRecord();
                         } else {
-                            //TODO handle server error
-                            Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                            //Server-side error
+                            Utils.serverErrorToast(OverviewActivity.this);
                         }
                     }
                 }, new Response.ErrorListener() {

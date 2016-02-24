@@ -22,20 +22,21 @@ import java.util.Set;
 public class VehicleDeleteDialogFragment extends DialogFragment {
     private static final String TAG = "cfbrownweb";
 
-    private ArrayList<String> mSelectedItems;  //List of the selected items
-    private LinkedHashMap<String,String> items; //Selectable items
+    private ArrayList<Vehicle> mSelectedItemsAL;  //List of the selected items
+    private ArrayList<Vehicle> itemsAL; //Selectable items
+    private Activity hostActivity;
 
     public VehicleDeleteDialogFragment(){
-        this.items = new LinkedHashMap<String,String>();
-        this.mSelectedItems = new ArrayList<String>();
+        this.itemsAL = new ArrayList<Vehicle>();
+        this.mSelectedItemsAL = new ArrayList<Vehicle>();
     }
 
-    public void setItems(LinkedHashMap<String, String> items) {
-        this.items = items;
+    public void setItems(ArrayList<Vehicle> items) {
+        this.itemsAL = items;
     }
 
     public interface DeleteDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog, ArrayList<String> selectedItems);
+        public void onDialogPositiveClick(DialogFragment dialog, ArrayList<Vehicle> selectedItems);
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 
@@ -44,6 +45,7 @@ public class VehicleDeleteDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        hostActivity = activity;
 
         //Check that the host has implemented the callback interface
         try {
@@ -58,16 +60,16 @@ public class VehicleDeleteDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Which to delete?") //TODO change to string
-                .setMultiChoiceItems(genItemStrings(items), null, new DialogInterface.OnMultiChoiceClickListener() {
+        builder.setTitle(getString(R.string.del_veh_title))
+                .setMultiChoiceItems(genItemStrings(itemsAL), null, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        String plate = getPlateFromMap(which);
-                        if(isChecked){
-                            mSelectedItems.add(plate);
-                        } else if (mSelectedItems.contains(plate)) {
+                        Vehicle vehicle = itemsAL.get(which);
+                        if (isChecked) {
+                            mSelectedItemsAL.add(vehicle);
+                        } else if (mSelectedItemsAL.contains(vehicle)) {
                             // Else, if the item is already in the array, remove it
-                            mSelectedItems.remove(plate);
+                            mSelectedItemsAL.remove(vehicle);
                         }
 
                     }
@@ -75,7 +77,7 @@ public class VehicleDeleteDialogFragment extends DialogFragment {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogPositiveClick(VehicleDeleteDialogFragment.this, mSelectedItems);
+                        mListener.onDialogPositiveClick(VehicleDeleteDialogFragment.this, mSelectedItemsAL);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -89,32 +91,20 @@ public class VehicleDeleteDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-    private String[] genItemStrings(HashMap<String,String> items){
+    private String[] genItemStrings(ArrayList<Vehicle> items){
         //Create valid strings for the delete list
         String[] itemStrings = new String[items.size()];
 
         //Put all the values into the itemStrings array
-        int i = 0;
-        for(HashMap.Entry<String, String> entry : items.entrySet()){
-            itemStrings[i] = entry.getKey().toUpperCase() + "\n" + entry.getValue();
-            i++;
+        for(int i = 0; i < items.size(); i++){
+            StringBuilder sb = new StringBuilder();
+            sb.append(items.get(i).getPlate().toUpperCase());
+            sb.append("\n");
+            sb.append(items.get(i).getName());
+            sb.append("\n");
+            itemStrings[i] = sb.toString();
         }
+
         return itemStrings;
-    }
-
-    private String getPlateFromMap(int index){
-        Iterator<String> itemsIterator = items.keySet().iterator();
-        String plate = "";
-
-        try{
-            for(int i = 0; i < index; i++){
-                itemsIterator.next();
-            }
-            plate = itemsIterator.next();
-        }
-        catch (NoSuchElementException e){
-            //TODO handle exception
-        }
-        return plate;
     }
 }

@@ -51,8 +51,8 @@ public class DelRecordConfDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Are you sure?") //TODO Change to string
-                .setMessage("Are you sure you want to delete the following records:\n" + constructDelQueueString())
+        builder.setTitle(getString(R.string.del_conf_title))
+                .setMessage(getString(R.string.del_rec_conf_message) + "\n" + constructDelQueueString())
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

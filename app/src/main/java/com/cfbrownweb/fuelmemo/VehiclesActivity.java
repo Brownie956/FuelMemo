@@ -54,8 +54,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
 
     private Menu optionsMenu;
     private RelativeLayout vehiclesContent;
-    private LinkedHashMap<String, String> vehicles; //TODO change to arraylist<Vehicle>
     private ListView vehicleListView;
+    protected static ArrayList<Vehicle> vehiclesAL; //allow access from other activities
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +66,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         //Initial setup
         setTitle(getResources().getString(R.string.vehicles_title));
         vehiclesContent = (RelativeLayout) findViewById(R.id.vehicles_content_layout);
-        vehicles = new LinkedHashMap<String, String>();
+        vehiclesAL = new ArrayList<Vehicle>();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -102,8 +102,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                             //Enable delete vehicle menu item
                             optionsMenu.findItem(R.id.vehicles_menu_delete_vehicle).setEnabled(true);
 
-                            //Store all vehicles in map
-                            storeVehiclesInHashMap(returnedResponse);
+                            //Store all vehicles in arrayList
+                            storeVehiclesLocally(returnedResponse);
 
                             //Add all returned vehicles to the list view
                             ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, returnedResponse);
@@ -151,7 +151,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         queue.add(jsArrayRequest);
     }
 
-    public void deleteVehicles(final ArrayList<String> vehiclesToDelete) {
+    public void deleteVehicles(final ArrayList<Vehicle> vehiclesToDelete) {
         RequestQueue queue = Volley.newRequestQueue(VehiclesActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, deleteVehiclesUrl,
                 new Response.Listener<String>() {
@@ -159,9 +159,17 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                     public void onResponse(String response) {
                         //Check for success
                         if(response.equals("1")){
-                            //Remove the vehicles from vehicles hashmap
-                            for(String vehicle : vehiclesToDelete){
-                                vehicles.remove(vehicle);
+
+                            //Find the vehicle in array list to delete
+                            for(Vehicle vehicle : vehiclesToDelete){
+                                //For every vehicle to delete...
+                                for(int i = 0; i < vehiclesAL.size(); i++){
+                                    //...loop over vehicles and find it
+                                    if(vehiclesAL.get(i).getPlate().equals(vehicle.getPlate())){
+                                        //Found vehicle - Delete it from arrayList
+                                        vehiclesAL.remove(i);
+                                    }
+                                }
                             }
 
                             //Reload the vehicles list
@@ -188,11 +196,9 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                Iterator<String> delIterator = vehiclesToDelete.iterator();
-                int i = 0;
-                while(delIterator.hasNext()){
-                    params.put("plates["+i+"]", delIterator.next());
-                    i++;
+
+                for(int i = 0; i < vehiclesToDelete.size(); i++){
+                    params.put("plates["+i+"]", vehiclesToDelete.get(i).getPlate());
                 }
 
                 return params;
@@ -211,39 +217,34 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         startActivity(intent);
     }
 
-    private void storeVehiclesInHashMap(JSONArray vehicles){
-        Log.i(TAG, "Vehicles: " + vehicles.toString());
+    private void storeVehiclesLocally(JSONArray vehicles){
         for(int i = 0; i < vehicles.length(); i++){
             try {
                 //Get vehicle
                 JSONObject vehicle = vehicles.getJSONObject(i);
-                //Store in hashmap
-                this.vehicles.put(vehicle.getString("plate"), vehicle.getString("name"));
+
+                //Create Vehicle object and store
+                vehiclesAL.add(new Vehicle(vehicle.getString("plate"), vehicle.getString("name")));
             }
             catch (JSONException e) {
-                //TODO handle exception
+                //JSON error - server-side
+                Utils.serverErrorToast(this);
             }
         }
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog, ArrayList<String> selectedItems) {
+    public void onDialogPositiveClick(DialogFragment dialog, ArrayList<Vehicle> selectedItems) {
         //Are you sure? - Confirmation
         DelVehicleConfDialogFragment delConf = new DelVehicleConfDialogFragment();
-
-        //Store selected vehicles in hashmap with associated name
-        LinkedHashMap<String, String> delVehicles = new LinkedHashMap<String,String>();
-        for(String vehicle : selectedItems){
-            delVehicles.put(vehicle, vehicles.get(vehicle));
-        }
-        delConf.setItems(delVehicles);
+        delConf.setItems(selectedItems);
 
         //Show confirmation dialog
         delConf.show(getFragmentManager(), "DelConfirmationDialog");
     }
 
     @Override
-    public void onDialogDeleteClick(DialogFragment dialog, ArrayList<String> selectedItems) {
+    public void onDialogDeleteClick(DialogFragment dialog, ArrayList<Vehicle> selectedItems) {
         //Delete items
         deleteVehicles(selectedItems);
     }
@@ -276,7 +277,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                 return true;
             case R.id.vehicles_menu_delete_vehicle:
                 VehicleDeleteDialogFragment deleteDialogFragment = new VehicleDeleteDialogFragment();
-                deleteDialogFragment.setItems(vehicles);
+                deleteDialogFragment.setItems(vehiclesAL);
                 deleteDialogFragment.show(getFragmentManager(), "deleteVehicleDialog");
                 return true;
             case R.id.vehicles_menu_settings:

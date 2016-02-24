@@ -160,8 +160,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                             allRecordsReq();
                         }
                         else {
-                            //TODO handle server error
-                            Toast.makeText(AllRecordsActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                            //Server-side error
+                            Utils.serverErrorToast(AllRecordsActivity.this);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -275,7 +275,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             }
         }
         catch (JSONException e){
-            //TODO Handle Exception
+            //JSON problem - Server-side error
+            Utils.serverErrorToast(this);
         }
         return table;
     }
@@ -296,7 +297,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             }
         }
         catch (JSONException e){
-            //TODO handle exception
+            //JSON problem - Server-side error
+            Utils.serverErrorToast(this);
         }
     }
 

@@ -13,6 +13,7 @@
     <string name="add_vehicle_title">Add Vehicle</string>
     <string name="overview_title">Overview</string>
     <string name="all_records_title">All Records</string>
+    <string name="no_connection_title">No Connection</string>
     <string name="net_retry_prompt">No network connection found. Please check that your device\'s Data or Wi-Fi is on and click connect</string>
     <string name="net_con_btn_text">Connect</string>
     <string name="net_retry_fail">No network connection found</string>
@@ -40,8 +41,13 @@
         Please remove a vehicle before adding another
     </string>
     <string name="submit_cancel">Cancelled</string>
-    <string name="settings_title">Settings</string>
+    <string name="del_rec_title">Which records to delete?</string>
+    <string name="del_veh_title">Which vehicles to delete?</string>
+    <string name="del_conf_title">Are you sure?</string>
+    <string name="del_rec_conf_message">Are you sure you want to delete the following records:</string>
+    <string name="del_veh_conf_message">Are you sure you want to delete the following vehicles:</string>
 
+    <string name="settings_title">Settings</string>
     <string name="settings_vehicle_heading">Vehicles Page</string>
     <string name="settings_tile_heading">Tile Colour - This is the background colour of vehicle tiles</string>
     <string name="settings_overview_heading">Overview Page</string>
@@ -49,6 +55,5 @@
     <string name="settings_n_records_dialog_title">Number of records</string>
     <string name="settings_n_records_cancel">Cancel</string>
     <string name="settings_n_records_set">Set</string>
-    <string name="no_connection_title">No Connection</string>
 
 </resources>
