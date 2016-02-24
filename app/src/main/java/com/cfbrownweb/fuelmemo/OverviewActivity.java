@@ -58,6 +58,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
     private final String addRecordUrl = "http://cfbrownweb.ngrok.io/fuel/addRecord.php";
     private final String getNumberOfRecordsUrl = "http://cfbrownweb.ngrok.io/fuel/getNumberOfRecords.php";
     private final String removeOldestRecordUrl = "http://cfbrownweb.ngrok.io/fuel/deleteOldestRecord.php";
+    private final String recordExistsUrl = "http://cfbrownweb.ngrok.io/fuel/recordExists.php";
 
     private Menu optionsMenu;
     private RelativeLayout overviewLayout;
@@ -319,7 +320,6 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
         Log.i(TAG,"IN SUBMIT RECORD");
         final String date = parseDate(year, month, day, "-");
 
-
         RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, addRecordUrl,
                 new Response.Listener<String>() {
@@ -416,7 +416,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                                     MaxRecordsDialogFragment maxRecordsDialogFragment = new MaxRecordsDialogFragment();
                                     maxRecordsDialogFragment.show(getFragmentManager(), "MaxRecordsReachedDialog");
                                 } else {
-                                    submitRecord();
+                                    checkDuplicateRecord();
                                 }
                             } catch (NumberFormatException e) {
                                 Log.d(TAG, "Didn't parse response");
@@ -447,6 +447,54 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             };
             queue.add(stringRequest);
         }
+    }
+
+    private void checkDuplicateRecord(){
+        final String date = parseDate(year, month, day, "-");
+
+        RequestQueue queue = Volley.newRequestQueue(OverviewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, recordExistsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.equals("1")) {
+                            //Duplicate entry
+                            String msg = "Record for date " + date + " already exists";
+                            Toast.makeText(OverviewActivity.this, msg, Toast.LENGTH_LONG).show();
+                        }
+                        else if(response.equals("0")){
+                            //No duplicates
+                            submitRecord();
+                        }
+                        else {
+                            //Server-side error
+                            Utils.serverErrorToast(OverviewActivity.this);
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(OverviewActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(OverviewActivity.this);
+                }
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("plate", plate);
+                params.put("date", date);
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
     @Override
