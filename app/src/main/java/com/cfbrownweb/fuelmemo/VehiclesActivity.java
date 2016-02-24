@@ -87,36 +87,49 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
 
                         final JSONArray returnedResponse = response;
 
-                        //TODO check for no vehicles
+                        TextView noRecordsTv = (TextView) findViewById(R.id.no_vehicles_message);
 
-                        //Store all vehicles in map
-                        storeVehiclesInHashMap(returnedResponse);
+                        if (returnedResponse.length() == 0) {
+                            //No Vehicles - Display message
+                            noRecordsTv.setText(getResources().getString(R.string.no_vehicles));
+                            noRecordsTv.setVisibility(View.VISIBLE);
 
-                        //Add all returned vehicles to the list view
-                        ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, returnedResponse);
-                        vehicleListView = (ListView) findViewById(R.id.vehicle_list);
-                        vehicleListView.setAdapter(vehicleAdaptor);
+                            //Disable delete vehicle menu item
+                            optionsMenu.findItem(R.id.vehicles_menu_delete_vehicle).setEnabled(false);
+                        } else {
+                            //Hide no vehicles message
+                            noRecordsTv.setVisibility(View.GONE);
+                            //Enable delete vehicle menu item
+                            optionsMenu.findItem(R.id.vehicles_menu_delete_vehicle).setEnabled(true);
 
-                        //Click listener on each item
-                        vehicleListView.setOnItemClickListener(
-                                new AdapterView.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            //Store all vehicles in map
+                            storeVehiclesInHashMap(returnedResponse);
 
-                                        try{
-                                            //Get the value of the position clicked
-                                            String plate = returnedResponse.getJSONObject(position).getString("plate");
-                                            String name = returnedResponse.getJSONObject(position).getString("name");
-//                                            Toast.makeText(VehiclesActivity.this, plate, Toast.LENGTH_LONG).show();
-                                            goToOverview(plate,name);
-                                        }
-                                        catch (JSONException e){
-                                            //Give a standard error to the user
-                                            Utils.defaultErrorToast(VehiclesActivity.this);
+                            //Add all returned vehicles to the list view
+                            ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, returnedResponse);
+                            vehicleListView = (ListView) findViewById(R.id.vehicle_list);
+                            vehicleListView.setAdapter(vehicleAdaptor);
+
+                            //Click listener on each item
+                            vehicleListView.setOnItemClickListener(
+                                    new AdapterView.OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                            try {
+                                                //Get the value of the position clicked
+                                                String plate = returnedResponse.getJSONObject(position).getString("plate");
+                                                String name = returnedResponse.getJSONObject(position).getString("name");
+    //                                            Toast.makeText(VehiclesActivity.this, plate, Toast.LENGTH_LONG).show();
+                                                goToOverview(plate, name);
+                                            } catch (JSONException e) {
+                                                //Issue is server-side, show server error toast
+                                                Utils.serverErrorToast(VehiclesActivity.this);
+                                            }
                                         }
                                     }
-                                }
-                        );
+                            );
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override

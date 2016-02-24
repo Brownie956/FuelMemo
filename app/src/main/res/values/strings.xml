@@ -18,6 +18,7 @@
     <string name="net_retry_fail">No network connection found</string>
     <string name="default_error">Oops, Something went wrong, please try again</string>
     <string name="server_error">Oops, Something went wrong, we are looking into it</string>
+    <string name="no_vehicles">You don\'t have any vehicles. Click the menu to add a vehicle</string>
     <string name="no_records">There are no records found for the plate</string>
     <string name="overview_heading_default">Previous records</string>
     <string name="all_records_heading_default">All records</string>

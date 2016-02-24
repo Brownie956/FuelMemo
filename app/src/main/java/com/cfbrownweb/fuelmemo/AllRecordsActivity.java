@@ -93,8 +93,13 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                             TextView noRecordsTv = new TextView(AllRecordsActivity.this);
                             noRecordsTv.setText(getString(R.string.no_records));
                             allRecordsScroll.addView(noRecordsTv);
+
+                            //Disable delete vehicle menu item
+                            optionsMenu.findItem(R.id.all_records_menu_del_records).setEnabled(false);
                         }
                         else {
+                            //Enable delete vehicle menu item
+                            optionsMenu.findItem(R.id.all_records_menu_del_records).setEnabled(true);
 
                             //Create and store Record objects
                             parseJSONToList(response);
