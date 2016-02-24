@@ -114,9 +114,17 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
                 //Reset refresh icon
                 Utils.setRefreshIconState(false, optionsMenu);
+
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(AllRecordsActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(AllRecordsActivity.this);
+                }
             }
         }) {
             @Override
@@ -147,14 +155,21 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                             allRecordsReq();
                         }
                         else {
-                            //Something went wrong
+                            //TODO handle server error
                             Toast.makeText(AllRecordsActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(AllRecordsActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(AllRecordsActivity.this);
+                }
             }
         }){
             @Override

@@ -75,14 +75,21 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                             //success
                             goToVehicles();
                         } else {
-                            //Something went wrong
+                            //TODO handle if duplicate entry
                             Toast.makeText(AddVehicleActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(AddVehicleActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(AddVehicleActivity.this);
+                }
             }
         }) {
             @Override
@@ -141,13 +148,20 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                                 }
                             } catch (NumberFormatException e) {
                                 Log.d(TAG, "Didn't parse response");
-                                //TODO handle exception
+                                Utils.defaultErrorToast(AddVehicleActivity.this);
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //TODO handle error
+                    if(error.networkResponse == null){
+                        //Network error
+                        Utils.netErrorToast(AddVehicleActivity.this);
+                    }
+                    else {
+                        //A different error
+                        Utils.defaultErrorToast(AddVehicleActivity.this);
+                    }
                 }
             });
             queue.add(stringRequest);

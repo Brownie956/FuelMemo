@@ -59,7 +59,7 @@ public class ConnectionActivity extends AppCompatActivity {
         }
         else {
             //Notify the user
-            Toast.makeText(this, getString(R.string.net_retry_fail), Toast.LENGTH_LONG).show();
+            Utils.netErrorToast(this);
         }
     }
 

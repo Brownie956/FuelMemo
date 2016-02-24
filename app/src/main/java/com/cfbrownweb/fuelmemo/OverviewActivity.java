@@ -136,9 +136,17 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
                 //Reset refresh icon
                 Utils.setRefreshIconState(false, optionsMenu);
+
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(OverviewActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(OverviewActivity.this);
+                }
             }
         }) {
             @Override
@@ -331,7 +339,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
                             lastNRecordsReq(String.valueOf(getLimit()));
                         } else {
-                            //Something went wrong
+                            //TODO handle duplicate record submission
                             Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                         }
 
@@ -339,7 +347,14 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(OverviewActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(OverviewActivity.this);
+                }
             }
         }) {
             @Override
@@ -404,18 +419,19 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                                 }
                             } catch (NumberFormatException e) {
                                 Log.d(TAG, "Didn't parse response");
-                                //TODO handle exception
+                                //TODO handle exception - server error
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //TODO handle error
                     if(error.networkResponse == null){
-                        Log.i(TAG, "No Network");
+                        //Network error
+                        Utils.netErrorToast(OverviewActivity.this);
                     }
                     else {
-                        //Something else happened
+                        //A different error
+                        Utils.defaultErrorToast(OverviewActivity.this);
                     }
                 }
             }) {
@@ -455,14 +471,21 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                             //Record deleted - Submit new record
                             submitRecord();
                         } else {
-                            //Something went wrong
+                            //TODO handle server error
                             Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(OverviewActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(OverviewActivity.this);
+                }
             }
         }) {
             @Override

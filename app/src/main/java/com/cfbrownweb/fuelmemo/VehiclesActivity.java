@@ -111,7 +111,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                                             goToOverview(plate,name);
                                         }
                                         catch (JSONException e){
-                                            //TODO Handle Json Exception
+                                            //Give a standard error to the user
+                                            Utils.defaultErrorToast(VehiclesActivity.this);
                                         }
                                     }
                                 }
@@ -120,9 +121,17 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
                 //Reset refresh icon
                 Utils.setRefreshIconState(false, optionsMenu);
+
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(VehiclesActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(VehiclesActivity.this);
+                }
             }
         }
         );
@@ -147,13 +156,20 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                         }
                         else {
                             //Something went wrong
-                            Toast.makeText(VehiclesActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                            Utils.defaultErrorToast(VehiclesActivity.this);
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //TODO handle error
+                if(error.networkResponse == null){
+                    //Network error
+                    Utils.netErrorToast(VehiclesActivity.this);
+                }
+                else {
+                    //A different error
+                    Utils.defaultErrorToast(VehiclesActivity.this);
+                }
             }
         }){
             @Override
