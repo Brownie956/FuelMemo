@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">FuelMemo</string>
+
     <string name="menu_item_settings">Settings</string>
     <string name="menu_item_add_vehicle">Add Vehicle</string>
     <string name="menu_item_delete_vehicle">Delete Vehicle</string>
     <string name="menu_item_all_records">View all records</string>
     <string name="menu_item_delete_records">Delete Records</string>
     <string name="menu_item_refresh">Refresh</string>
+
     <string name="default_plate">Vehicle Plate</string>
     <string name="default_name">Vehicle Name</string>
 
@@ -14,6 +16,21 @@
     <string name="overview_title">Overview</string>
     <string name="all_records_title">All Records</string>
     <string name="no_connection_title">No Connection</string>
+    <string name="title_activity_all_records">AllRecordsActivity</string>
+    <string name="title_activity_add_vehicle">AddVehicleActivity</string>
+    <string name="del_rec_title">Which records to delete?</string>
+    <string name="del_veh_title">Which vehicles to delete?</string>
+    <string name="del_conf_title">Are you sure?</string>
+    <string name="settings_n_records_dialog_title">Number of records</string>
+    <string name="settings_title">Settings</string>
+
+    <string name="overview_heading_default">Previous records</string>
+    <string name="all_records_heading_default">All records</string>
+    <string name="settings_vehicle_heading">Vehicles Page</string>
+    <string name="settings_tile_heading">Tile Colour - This is the background colour of vehicle tiles</string>
+    <string name="settings_overview_heading">Overview Page</string>
+    <string name="settings_n_records_heading">Number of previous records - This is the number of previous records on the overview page</string>
+
     <string name="net_retry_prompt">No network connection found. Please check that your device\'s Data or Wi-Fi is on and click connect</string>
     <string name="net_con_btn_text">Connect</string>
     <string name="net_retry_fail">No network connection found</string>
@@ -21,9 +38,6 @@
     <string name="server_error">Oops, Something went wrong, we are looking into it</string>
     <string name="no_vehicles">You don\'t have any vehicles. Click the menu to add a vehicle</string>
     <string name="no_records">There are no records found for the plate</string>
-    <string name="overview_heading_default">Previous records</string>
-    <string name="all_records_heading_default">All records</string>
-    <string name="submit_btn_text">Submit</string>
     <string name="date_input_error">Please select a valid date</string>
     <string name="miles_input_error">Please enter a valid miles value</string>
     <string name="cost_input_error">Please enter a valid cost value</string>
@@ -31,28 +45,18 @@
         You have reached the maximum of 50 submissions for a single vehicle. Would you like to remove the oldest record?
         Answering no will cancel this submission. You can manually remove submissions on the \'View all submissions\' page
     </string>
-    <string name="title_activity_all_records">AllRecordsActivity</string>
-    <string name="title_activity_add_vehicle">AddVehicleActivity</string>
-    <string name="plate_input_hint">Enter vehicle plate</string>
-    <string name="name_input_hint">Enter vehicle name</string>
-    <string name="add_vehicle_btn">Submit</string>
     <string name="max_vehicles_reached_message">
         You have reached the maximum of 10 vehicles.
         Please remove a vehicle before adding another
     </string>
+
+    <string name="submit_btn_text">Submit</string>
+    <string name="add_vehicle_btn">Submit</string>
+    <string name="plate_input_hint">Enter vehicle plate</string>
+    <string name="name_input_hint">Enter vehicle name</string>
     <string name="submit_cancel">Cancelled</string>
-    <string name="del_rec_title">Which records to delete?</string>
-    <string name="del_veh_title">Which vehicles to delete?</string>
-    <string name="del_conf_title">Are you sure?</string>
     <string name="del_rec_conf_message">Are you sure you want to delete the following records:</string>
     <string name="del_veh_conf_message">Are you sure you want to delete the following vehicles:</string>
-
-    <string name="settings_title">Settings</string>
-    <string name="settings_vehicle_heading">Vehicles Page</string>
-    <string name="settings_tile_heading">Tile Colour - This is the background colour of vehicle tiles</string>
-    <string name="settings_overview_heading">Overview Page</string>
-    <string name="settings_n_records_heading">Number of previous records - This is the number of previous records on the overview page</string>
-    <string name="settings_n_records_dialog_title">Number of records</string>
     <string name="settings_n_records_cancel">Cancel</string>
     <string name="settings_n_records_set">Set</string>
 
