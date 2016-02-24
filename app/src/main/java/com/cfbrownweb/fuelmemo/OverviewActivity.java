@@ -340,8 +340,8 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
                             lastNRecordsReq(String.valueOf(getLimit()));
                         } else {
-                            //TODO handle duplicate record submission
-                            Toast.makeText(OverviewActivity.this, "Oops, Something went wrong, please try again", Toast.LENGTH_LONG).show();
+                            //Server-side error
+                            Utils.serverErrorToast(OverviewActivity.this);
                         }
 
                     }
