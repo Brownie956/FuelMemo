@@ -127,6 +127,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                 }
                 else {
                     //A different error
+                    Log.i(TAG, "Error Response");
                     Utils.defaultErrorToast(AllRecordsActivity.this);
                 }
             }
@@ -285,7 +286,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
         try {
             JSONArray jsonArray = new JSONArray(jArray);
 
-            for(int i = 0; i < jArray.length(); i++){
+            for(int i = 0; i < jsonArray.length(); i++){
                 //Get values from array
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 String date = jsonObject.getString("date");
@@ -297,6 +298,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
         }
         catch (JSONException e){
             //JSON problem - Server-side error
+            Log.i(TAG, "JSON Error");
             Utils.serverErrorToast(this);
         }
     }
