@@ -128,7 +128,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
                 else {
                     //A different error
                     Log.i(TAG, "Error Response");
-                    Utils.defaultErrorToast(AllRecordsActivity.this);
+                    Utils.serverErrorToast(AllRecordsActivity.this);
                 }
             }
         }) {

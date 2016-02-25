@@ -136,7 +136,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                 }
                 else {
                     //A different error
-                    Utils.defaultErrorToast(VehiclesActivity.this);
+                    Log.i(TAG, String.valueOf(error.networkResponse.statusCode));
+                    Utils.serverErrorToast(VehiclesActivity.this);
                 }
             }
         }

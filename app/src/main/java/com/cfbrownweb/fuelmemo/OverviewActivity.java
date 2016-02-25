@@ -146,7 +146,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 }
                 else {
                     //A different error
-                    Utils.defaultErrorToast(OverviewActivity.this);
+                    Utils.serverErrorToast(OverviewActivity.this);
                 }
             }
         }) {
