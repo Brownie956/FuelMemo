@@ -25,7 +25,7 @@ public class ConnectionActivity extends AppCompatActivity {
         Serializable dest = getIntent().getSerializableExtra("dest");
         if(dest == null){
             //Only on start up
-            destination = VehiclesActivity.class;
+            destination = LoginActivity.class;
         }
         else {
             destination = (Class) dest;

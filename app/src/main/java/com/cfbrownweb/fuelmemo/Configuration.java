@@ -15,6 +15,7 @@ public class Configuration {
         return sessionInstance;
     }
 
+    private User user;
     private Vehicle vehicle;
     private ArrayList<Integer> tileColourIds;
 
@@ -41,6 +42,14 @@ public class Configuration {
 
     public int getTileColour(int index){
         return tileColourIds.get(index);
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public SharedPreferences getSharedPrefs(Context context){

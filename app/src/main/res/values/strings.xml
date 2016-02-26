@@ -23,6 +23,7 @@
     <string name="del_conf_title">Are you sure?</string>
     <string name="settings_n_records_dialog_title">Number of records</string>
     <string name="settings_title">Settings</string>
+    <string name="login_title">Login</string>
 
     <string name="overview_heading_default">Previous records</string>
     <string name="all_records_heading_default">All records</string>
@@ -49,6 +50,18 @@
         You have reached the maximum of 10 vehicles.
         Please remove a vehicle before adding another
     </string>
+    <string name="login_error">We could not find that username and password combination in our database</string>
+    <string name="login_empty_user">Please enter a username</string>
+    <string name="login_empty_pass">Please enter a password</string>
+    <string name="login_min_user">Username must be 5 \- 20 characters</string>
+    <string name="login_min_pass">Password must be 5 \- 20 characters</string>
+
+    <string name="login_btn">Login</string>
+    <string name="login_username_heading">Username</string>
+    <string name="login_password_heading">Password</string>
+    <string name="login_username_hint">Enter Username</string>
+    <string name="login_password_hint">Enter Password</string>
+    <string name="login_sign_up_link">Sign Up \-></string>
 
     <string name="submit_btn_text">Submit</string>
     <string name="add_vehicle_btn">Submit</string>
