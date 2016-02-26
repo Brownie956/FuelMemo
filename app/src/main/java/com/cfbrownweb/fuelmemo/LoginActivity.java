@@ -140,4 +140,9 @@ public class LoginActivity extends AppCompatActivity {
         TextView loginError = (TextView) findViewById(R.id.login_error);
         loginError.setVisibility(View.VISIBLE);
     }
+
+    public void goToSignUp(View view){
+        Intent signUpIntent = new Intent(this, SignUpActivity.class);
+        startActivity(signUpIntent);
+    }
 }

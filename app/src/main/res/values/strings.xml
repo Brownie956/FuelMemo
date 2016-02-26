@@ -55,6 +55,12 @@
     <string name="login_empty_pass">Please enter a password</string>
     <string name="login_min_user">Username must be 5 \- 20 characters</string>
     <string name="login_min_pass">Password must be 5 \- 20 characters</string>
+    <string name="sign_up_empty_user">Please enter a username</string>
+    <string name="sign_up_empty_pass">Please enter a password</string>
+    <string name="sign_up_min_user">Username must be 5 \- 20 characters</string>
+    <string name="sign_up_min_pass">Password must be 5 \- 20 characters</string>
+    <string name="sign_up_password_mismatch">Passwords did not match, try again</string>
+    <string name="sign_up_user_exists">Username already exists</string>
 
     <string name="login_btn">Login</string>
     <string name="login_username_heading">Username</string>
@@ -62,6 +68,16 @@
     <string name="login_username_hint">Enter Username</string>
     <string name="login_password_hint">Enter Password</string>
     <string name="login_sign_up_link">Sign Up \-></string>
+
+    <string name="sign_up_username_heading">Username</string>
+    <string name="sign_up_username_criteria">Username must consist of only letters and numbers</string>
+    <string name="sign_up_password_heading">Password</string>
+    <string name="sign_up_password_criteria">Username must not contain spaces</string>
+    <string name="sign_up_password_repeat_heading">Repeat Password</string>
+    <string name="sign_up_username_hint">Enter Username</string>
+    <string name="sign_up_password_hint">Enter Password</string>
+    <string name="sign_up_password_repeat_hint">Enter Password again</string>
+    <string name="sign_up_btn">Sign Up</string>
 
     <string name="submit_btn_text">Submit</string>
     <string name="add_vehicle_btn">Submit</string>
@@ -72,5 +88,6 @@
     <string name="del_veh_conf_message">Are you sure you want to delete the following vehicles:</string>
     <string name="settings_n_records_cancel">Cancel</string>
     <string name="settings_n_records_set">Set</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
 
 </resources>
