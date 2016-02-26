@@ -2,6 +2,7 @@ package com.cfbrownweb.fuelmemo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,16 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
+
 class VehicleAdapter extends ArrayAdapter<String> {
 
-    JSONArray jArray;
+    ArrayList<Vehicle> vehicles;
     private Context context;
 
-    VehicleAdapter(Context context, JSONArray jsonArray) {
-        super(context, R.layout.custom_row, new String[jsonArray.length()]);
-        this.jArray = jsonArray;
+    VehicleAdapter(Context context, ArrayList<Vehicle> vehicles) {
+        super(context, R.layout.custom_row, new String[vehicles.size()]);
+        this.vehicles = vehicles;
         this.context = context;
     }
 
@@ -37,16 +40,9 @@ class VehicleAdapter extends ArrayAdapter<String> {
         rowLayout.setBackgroundResource(Configuration.getConfig().getTileColour(tileColourIndex));
 
         //Set the various elements of the row view
-        String plate = "";
-        String name = "";
-        try {
-            plate = jArray.getJSONObject(position).getString("plate");
-            name = jArray.getJSONObject(position).getString("name");
-        }
-        catch (JSONException e){
-            //JSON error - server-side error
-            Utils.serverErrorToast(context);
-        }
+        String plate = vehicles.get(position).getPlate();
+        String name = vehicles.get(position).getName();
+        Log.i("cfbrownweb", "here 1");
         TextView rowPlate = (TextView) customView.findViewById(R.id.row_plate);
         TextView rowVehicleName = (TextView) customView.findViewById(R.id.row_vehicle_name);
 

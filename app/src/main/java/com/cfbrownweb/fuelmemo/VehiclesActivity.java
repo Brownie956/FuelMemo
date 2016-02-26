@@ -69,20 +69,16 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
 
     public void allVehiclesReq() {
         RequestQueue queue = Volley.newRequestQueue(VehiclesActivity.this);
-        JsonArrayRequest jsArrayRequest = new JsonArrayRequest(allVehiclesUrl,
-                new Response.Listener<JSONArray>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, allVehiclesUrl,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONArray response) {
-                        Log.i(TAG, response.toString());
-
+                    public void onResponse(String response) {
                         //Reset refresh icon
                         Utils.setRefreshIconState(false, optionsMenu);
 
-                        final JSONArray returnedResponse = response;
-
                         TextView noRecordsTv = (TextView) findViewById(R.id.no_vehicles_message);
 
-                        if (returnedResponse.length() == 0) {
+                        if (response.equals("0")) {
                             //No Vehicles - Display message
                             noRecordsTv.setText(getResources().getString(R.string.no_vehicles));
                             noRecordsTv.setVisibility(View.VISIBLE);
@@ -96,53 +92,52 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                             optionsMenu.findItem(R.id.vehicles_menu_delete_vehicle).setEnabled(true);
 
                             //Store all vehicles in arrayList
-                            storeVehiclesLocally(returnedResponse);
+                            if(storeVehiclesLocally(response)) {
+                                for(Vehicle v : vehiclesAL){
+                                    Log.i(TAG, v.getPlate());
+                                }
+                                //Add all returned vehicles to the list view
+                                ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, vehiclesAL);
+                                vehicleListView = (ListView) findViewById(R.id.vehicle_list);
+                                vehicleListView.setAdapter(vehicleAdaptor);
 
-                            //Add all returned vehicles to the list view
-                            ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, returnedResponse);
-                            vehicleListView = (ListView) findViewById(R.id.vehicle_list);
-                            vehicleListView.setAdapter(vehicleAdaptor);
-
-                            //Click listener on each item
-                            vehicleListView.setOnItemClickListener(
+                                //Click listener on each item
+                                vehicleListView.setOnItemClickListener(
                                     new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                                            try {
-                                                //Get the value of the position clicked
-                                                String plate = returnedResponse.getJSONObject(position).getString("plate");
-                                                String name = returnedResponse.getJSONObject(position).getString("name");
-    //                                            Toast.makeText(VehiclesActivity.this, plate, Toast.LENGTH_LONG).show();
-                                                goToOverview(plate, name);
-                                            } catch (JSONException e) {
-                                                //Issue is server-side, show server error toast
-                                                Utils.serverErrorToast(VehiclesActivity.this);
-                                            }
+                                            //Get the value of the position clicked
+                                            String plate = vehiclesAL.get(position).getPlate();
+                                            String name = vehiclesAL.get(position).getName();
+                                            goToOverview(plate, name);
                                         }
                                     }
-                            );
+                                );
+                            }
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Reset refresh icon
-                Utils.setRefreshIconState(false, optionsMenu);
-
                 if(error.networkResponse == null){
                     //Network error
                     Utils.netErrorToast(VehiclesActivity.this);
                 }
                 else {
                     //A different error
-                    Log.i(TAG, String.valueOf(error.networkResponse.statusCode));
                     Utils.serverErrorToast(VehiclesActivity.this);
                 }
             }
-        }
-        );
-        queue.add(jsArrayRequest);
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
     public void deleteVehicles(final ArrayList<Vehicle> vehiclesToDelete) {
@@ -211,20 +206,25 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         startActivity(intent);
     }
 
-    private void storeVehiclesLocally(JSONArray vehicles){
-        for(int i = 0; i < vehicles.length(); i++){
-            try {
+    private boolean storeVehiclesLocally(String vehicles){
+        vehiclesAL.clear();
+        Log.i(TAG, vehicles);
+        try {
+            JSONArray vehiclesjArray = new JSONArray(vehicles);
+            for(int i = 0; i < vehiclesjArray.length(); i++){
                 //Get vehicle
-                JSONObject vehicle = vehicles.getJSONObject(i);
+                JSONObject vehicle = vehiclesjArray.getJSONObject(i);
 
                 //Create Vehicle object and store
                 vehiclesAL.add(new Vehicle(vehicle.getString("plate"), vehicle.getString("name")));
             }
-            catch (JSONException e) {
-                //JSON error - server-side
-                Utils.serverErrorToast(this);
-            }
         }
+        catch (JSONException e) {
+            //JSON error - server-side
+            Utils.serverErrorToast(this);
+            return false;
+        }
+        return true;
     }
 
     @Override
