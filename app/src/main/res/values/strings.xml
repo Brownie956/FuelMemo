@@ -70,6 +70,7 @@
     <string name="login_username_hint">Enter Username</string>
     <string name="login_password_hint">Enter Password</string>
     <string name="login_sign_up_link">Sign Up \-></string>
+    <string name="login_pass_reset_text">Forgotten your password? Email us at support@cfbrownweb.com</string>
 
     <string name="sign_up_username_heading">Username</string>
     <string name="sign_up_username_criteria">Username must consist of only letters and numbers</string>

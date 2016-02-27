@@ -88,4 +88,15 @@
         android:layout_alignParentStart="true"
         android:onClick="goToSignUp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/login_pass_reset_text"
+        android:id="@+id/pass_reset_text"
+        android:layout_below="@id/sign_up_link"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="46dp" />
+
 </RelativeLayout>
