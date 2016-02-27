@@ -62,7 +62,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SignUpActivity"
-            android:label="@string/title_activity_sign_up"
+            android:label="@string/sign_up_title"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".LoginActivity">
             <meta-data

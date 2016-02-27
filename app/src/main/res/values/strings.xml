@@ -25,6 +25,7 @@
     <string name="settings_n_records_dialog_title">Number of records</string>
     <string name="settings_title">Settings</string>
     <string name="login_title">Login</string>
+    <string name="sign_up_title">Sign Up</string>
 
     <string name="overview_heading_default">Previous records</string>
     <string name="all_records_heading_default">All records</string>
