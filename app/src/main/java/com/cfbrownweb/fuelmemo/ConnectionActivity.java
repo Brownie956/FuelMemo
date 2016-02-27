@@ -6,6 +6,7 @@
 package com.cfbrownweb.fuelmemo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,12 +21,19 @@ public class ConnectionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences settings = Configuration.getConfig().getSharedPrefs(this);
+        String currentUser = settings.getString("user", null);
 
         //Where are you trying to go?
         Serializable dest = getIntent().getSerializableExtra("dest");
-        if(dest == null){
-            //Only on start up
+        if(dest == null && currentUser == null){
+            //Start up and no user is logged in
             destination = LoginActivity.class;
+        }
+        else if(dest == null){
+            //Start up with a user logged in
+            destination = VehiclesActivity.class;
+            Configuration.getConfig().setUser(new User(currentUser));
         }
         else {
             destination = (Class) dest;

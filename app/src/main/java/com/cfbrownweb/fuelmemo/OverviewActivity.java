@@ -595,6 +595,17 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 Utils.setRefreshIconState(true, optionsMenu);
                 lastNRecordsReq(String.valueOf(getLimit()));
                 return true;
+            case R.id.menu_sign_out:
+                //Remove user from shared prefs
+                SharedPreferences settings = Configuration.getConfig().getSharedPrefs(this);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("user", null);
+                editor.apply();
+                //Navigate to the login screen
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

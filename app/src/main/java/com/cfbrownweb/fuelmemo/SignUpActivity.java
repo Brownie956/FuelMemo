@@ -5,6 +5,7 @@
 package com.cfbrownweb.fuelmemo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -66,9 +67,16 @@ public class SignUpActivity extends AppCompatActivity {
                             //set user in config
                             Configuration.getConfig().setUser(new User(user));
 
-                            //go to vehicles page
-                            Intent vehiclesIntent = new Intent(SignUpActivity.this, VehiclesActivity.class);
-                            startActivity(vehiclesIntent);
+                            //Store in shared prefs
+                            SharedPreferences settings = Configuration.getConfig().getSharedPrefs(SignUpActivity.this);
+                            SharedPreferences.Editor editor = settings.edit();
+                            editor.putString("user", user);
+                            editor.apply();
+
+                            //Navigate to vehicles page
+                            Intent intent = new Intent(SignUpActivity.this, ConnectionActivity.class);
+                            intent.putExtra("dest", VehiclesActivity.class);
+                            startActivity(intent);
 
                             //End sign in activity
                             finish();

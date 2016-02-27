@@ -7,6 +7,7 @@
     <string name="menu_item_all_records">View all records</string>
     <string name="menu_item_delete_records">Delete Records</string>
     <string name="menu_item_refresh">Refresh</string>
+    <string name="menu_item_sign_out">Sign Out</string>
 
     <string name="default_plate">Vehicle Plate</string>
     <string name="default_name">Vehicle Name</string>

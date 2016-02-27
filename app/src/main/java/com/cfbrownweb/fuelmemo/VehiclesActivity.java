@@ -6,6 +6,7 @@ package com.cfbrownweb.fuelmemo;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -291,6 +292,17 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             case R.id.menu_refresh:
                 Utils.setRefreshIconState(true, optionsMenu);
                 allVehiclesReq();
+                return true;
+            case R.id.menu_sign_out:
+                //Remove user from shared prefs
+                SharedPreferences settings = Configuration.getConfig().getSharedPrefs(this);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("user", null);
+                editor.apply();
+                //Navigate to the login screen
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
