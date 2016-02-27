@@ -87,6 +87,7 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                             goToVehicles();
                         } else {
                             //Something went wrong
+                            Log.i(TAG, "error response: " + response);
                             Utils.serverErrorToast(AddVehicleActivity.this);
                         }
                     }
@@ -106,8 +107,9 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("plate",plate);
-                params.put("name",name);
+                params.put("user", Configuration.getConfig().getUser().getUsername());
+                params.put("plate", plate);
+                params.put("name", name);
 
                 return params;
             }
@@ -134,6 +136,7 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            Log.i(TAG, "Number of vehicles: " + response);
                             try {
                                 int numberOfVehicles = Integer.parseInt(response);
 
@@ -175,7 +178,15 @@ public class AddVehicleActivity extends AppCompatActivity implements MaxVehicles
                         Utils.defaultErrorToast(AddVehicleActivity.this);
                     }
                 }
-            });
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("user",Configuration.getConfig().getUser().getUsername());
+
+                    return params;
+                }
+            };
             queue.add(stringRequest);
         }
     }

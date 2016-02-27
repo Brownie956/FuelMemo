@@ -60,6 +60,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
         setTitle(getResources().getString(R.string.vehicles_title));
         vehiclesContent = (RelativeLayout) findViewById(R.id.vehicles_content_layout);
         vehiclesAL = new ArrayList<Vehicle>();
+        vehicleListView = (ListView) findViewById(R.id.vehicle_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -79,6 +80,9 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                         TextView noRecordsTv = (TextView) findViewById(R.id.no_vehicles_message);
 
                         if (response.equals("0")) {
+                            vehiclesAL.clear();
+                            vehicleListView.setVisibility(View.GONE);
+
                             //No Vehicles - Display message
                             noRecordsTv.setText(getResources().getString(R.string.no_vehicles));
                             noRecordsTv.setVisibility(View.VISIBLE);
@@ -98,7 +102,6 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                                 }
                                 //Add all returned vehicles to the list view
                                 ListAdapter vehicleAdaptor = new VehicleAdapter(VehiclesActivity.this, vehiclesAL);
-                                vehicleListView = (ListView) findViewById(R.id.vehicle_list);
                                 vehicleListView.setAdapter(vehicleAdaptor);
 
                                 //Click listener on each item
@@ -113,6 +116,8 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                                         }
                                     }
                                 );
+                                //Show the listview
+                                vehicleListView.setVisibility(View.VISIBLE);
                             }
                         }
                     }
@@ -141,6 +146,9 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
     }
 
     public void deleteVehicles(final ArrayList<Vehicle> vehiclesToDelete) {
+        for(Vehicle v : vehiclesToDelete){
+            Log.i(TAG,"Vehicles to delete: " + v.getPlate());
+        }
         RequestQueue queue = Volley.newRequestQueue(VehiclesActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, deleteVehiclesUrl,
                 new Response.Listener<String>() {
@@ -185,8 +193,10 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
 
                 for(int i = 0; i < vehiclesToDelete.size(); i++){
+                    Log.i(TAG, "Param: " + vehiclesToDelete.get(i).getPlate());
                     params.put("plates["+i+"]", vehiclesToDelete.get(i).getPlate());
                 }
 
@@ -269,7 +279,7 @@ public class VehiclesActivity extends AppCompatActivity implements VehicleDelete
                 Intent addVehicleIntent = new Intent(this, AddVehicleActivity.class);
                 startActivity(addVehicleIntent);
                 return true;
-            case R.id.vehicles_menu_delete_vehicle:
+            case R.id.vehicles_menu_delete_vehicle: //TODO disable me
                 VehicleDeleteDialogFragment deleteDialogFragment = new VehicleDeleteDialogFragment();
                 deleteDialogFragment.setItems(vehiclesAL);
                 deleteDialogFragment.show(getFragmentManager(), "deleteVehicleDialog");

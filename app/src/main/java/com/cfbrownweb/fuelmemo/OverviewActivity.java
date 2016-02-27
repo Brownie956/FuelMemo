@@ -117,6 +117,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
 
                         Log.i(TAG, response);
                         ScrollView nRecordsScroll = (ScrollView) findViewById(R.id.last_n_records_scroll);
+                        nRecordsScroll.removeAllViews();
                         if(response.equals("-1")){
                             //Display no records message
                             TextView noRecordsTv = new TextView(OverviewActivity.this);
@@ -153,6 +154,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
                 params.put("plate",plate);
                 params.put("limit",limit);
 
@@ -361,6 +363,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
                 params.put("plate", plate);
                 params.put("date", date);
                 params.put("miles", miles);
@@ -440,6 +443,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<String, String>();
+                    params.put("user", Configuration.getConfig().getUser().getUsername());
                     params.put("plate", plate);
 
                     return params;
@@ -488,6 +492,7 @@ public class OverviewActivity extends AppCompatActivity implements MaxRecordsDia
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
                 params.put("plate", plate);
                 params.put("date", date);
 

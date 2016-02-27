@@ -87,6 +87,8 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
 
                         Log.i(TAG, response);
                         ScrollView allRecordsScroll = (ScrollView) findViewById(R.id.all_records_scroll);
+                        //Clear anything in scroll
+                        allRecordsScroll.removeAllViews();
                         if(response.equals("-1")){
                             //Display no records message
                             TextView noRecordsTv = new TextView(AllRecordsActivity.this);
@@ -102,9 +104,6 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
 
                             //Create and store Record objects
                             parseJSONToList(response);
-
-                            //Clear anything in scroll
-                            allRecordsScroll.removeAllViews();
 
                             //Display heading
                             TextView heading = (TextView) findViewById(R.id.all_records_heading);
@@ -135,6 +134,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
                 params.put("plate",plate);
 
                 return params;
@@ -180,6 +180,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("user", Configuration.getConfig().getUser().getUsername());
                 params.put("plate", Configuration.getConfig().getVehicle().getPlate());
 
                 int i = 0;
@@ -283,6 +284,7 @@ DelRecordConfDialogFragment.confirmDelDialogListener {
 
     private void parseJSONToList(String jArray){
         Vehicle currentVehicle = Configuration.getConfig().getVehicle();
+        records.clear();
         try {
             JSONArray jsonArray = new JSONArray(jArray);
 
